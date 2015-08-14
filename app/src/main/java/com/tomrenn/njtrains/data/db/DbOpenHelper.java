@@ -20,8 +20,8 @@ public final class DbOpenHelper extends SQLiteOpenHelper {
 
     public static final String CREATE_SERVICE_DATE = ""
             + "CREATE TABLE " + ServiceDate.TABLE + "("
-            + ServiceDate.ID + "INTEGER NOT NULL PRIMARY KEY"
-            + ServiceDate.DATE + "TEXT NOT NULL"
+            + ServiceDate.ID + "INTEGER NOT NULL PRIMARY KEY,"
+            + ServiceDate.DATE + "TEXT NOT NULL,"
             + ServiceDate.EXCEPTION_TYPE + "INTEGER NOT NULL"
             + ")";
 
@@ -33,7 +33,7 @@ public final class DbOpenHelper extends SQLiteOpenHelper {
             + Trip.HEADSIGN + " TEXT NOT NULL,"
             + Trip.DIRECTION_ID + " INTEGER NOT NULL,"
             + Trip.BLOCK_ID + " INTEGER NOT NULL,"
-            + Trip.SHAPE_ID + " INTEGER NOT NULL,"
+            + Trip.SHAPE_ID + " INTEGER NOT NULL"
             + ")";
 
     private static final String CREATE_STOP_TIME = ""
