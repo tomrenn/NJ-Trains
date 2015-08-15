@@ -1,5 +1,7 @@
 package com.tomrenn.njtrains.data;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.WorkerThread;
 
 import com.squareup.okhttp.Callback;
@@ -8,10 +10,12 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -24,6 +28,7 @@ import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.Subscriber;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 /**
@@ -34,6 +39,7 @@ public class RailData {
 
     private OkHttpClient httpClient;
     private File rootDir;
+    private SQLiteDatabase db;
 
     public RailData(OkHttpClient httpClient, File rootDir) {
         this.httpClient = httpClient;
@@ -66,7 +72,24 @@ public class RailData {
         };
     }
 
+    /**
+     * Given a file with table_name.txt, insert rows into the associated table
+     */
+    public Action1<File> csvTableInserts = new Action1<File>() {
+        @Override
+        public void call(File file) {
+            String tableName = file.getName();
+            if (tableName.endsWith(".txt")){
+                tableName = tableName.replace(".txt", "");
+            }
+
+        }
+    };
+
     public Single<File> getRailDataZip(final String url, final File file){
+        if (file.exists()){
+            return Single.just(file);
+        }
         return Single.create(new Single.OnSubscribe<File>() {
             @Override
             public void call(final SingleSubscriber<? super File> singleSubscriber) {

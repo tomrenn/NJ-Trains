@@ -9,6 +9,7 @@ import com.squareup.okhttp.OkHttpClient;
 
 import java.io.File;
 
+import com.tomrenn.njtrains.data.CsvFileObserver;
 import com.tomrenn.njtrains.data.RailData;
 import com.tomrenn.njtrains.data.db.DbOpenHelper;
 
@@ -39,20 +40,9 @@ public class MainActivity extends AppCompatActivity {
         DbOpenHelper helper = new DbOpenHelper(this);
 
         railData.getRailDataZip(RailData.TMP_URL, zipFile)
-                .flatMapObservable(railData.unzipRailData(dataDir))
+                .flatMapObservable(RailData.unzipRailData(dataDir))
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Action1<File>() {
-                    @Override
-                    public void call(File file) {
-                        Timber.d(file.getName());
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        Timber.e(throwable, throwable.toString());
-                        Timber.w("sadface");
-                    }
-                });
+                .subscribe(new CsvFileObserver(helper.getWritableDatabase()));
     }
 
     @Override
