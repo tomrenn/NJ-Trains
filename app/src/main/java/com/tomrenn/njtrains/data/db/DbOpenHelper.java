@@ -38,8 +38,8 @@ public final class DbOpenHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_STOP_TIME = ""
             + "CREATE TABLE " + StopTime.TABLE + "("
-            + StopTime.STOP_ID + "INTERGER NOT NULL REFERENCES " + Stop.TABLE + "(" + Stop.ID + "),"
-            + StopTime.TRIP_ID + "INTERGER NOT NULL REFERENCES " + Trip.TABLE + "(" + Trip.ID + "),"
+            + StopTime.STOP_ID + " INTEGER NOT NULL REFERENCES " + Stop.TABLE + "(" + Stop.ID + "),"
+            + StopTime.TRIP_ID + " INTEGER NOT NULL REFERENCES " + Trip.TABLE + "(" + Trip.ID + "),"
             + StopTime.ARRIVAL + " TEXT NOT NULL,"
             + StopTime.DEPARTURE + " TEXT NOT NULL,"
             + StopTime.SEQUENCE + " INTEGER NOT NULL,"

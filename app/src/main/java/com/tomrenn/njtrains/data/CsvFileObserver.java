@@ -52,7 +52,7 @@ public class CsvFileObserver implements Observer<File> {
     @Override
     public void onNext(File file) {
         String tableName = file.getName().replace(".txt", "");
-        if (!tableExists(tableName) || tableName.equals(StopTime.TABLE)){
+        if (!tableExists(tableName)){
             Timber.v("Table for " + file.getName() + " does not exist");
             return;
         }
