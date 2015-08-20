@@ -1,9 +1,13 @@
 package com.tomrenn.njtrains;
 
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import com.squareup.okhttp.OkHttpClient;
 
@@ -12,7 +16,12 @@ import java.io.File;
 import com.tomrenn.njtrains.data.CsvFileObserver;
 import com.tomrenn.njtrains.data.RailData;
 import com.tomrenn.njtrains.data.db.DbOpenHelper;
+import com.tomrenn.njtrains.ui.MainFragment;
+import com.tomrenn.njtrains.ui.StationPickerFragment;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
@@ -36,14 +45,20 @@ public class MainActivity extends AppCompatActivity {
         // todo: make splash screen with loading text
         // -- downloading trains
         // -- reading train data
-
         DbOpenHelper helper = new DbOpenHelper(this);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragmentContainer, new MainFragment())
+                .commit();
+
 
         railData.getRailDataZip(RailData.TMP_URL, zipFile)
                 .flatMapObservable(RailData.unzipRailData(dataDir))
                 .subscribeOn(Schedulers.io())
                 .subscribe(new CsvFileObserver(helper.getWritableDatabase()));
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

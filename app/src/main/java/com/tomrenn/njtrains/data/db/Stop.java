@@ -35,6 +35,9 @@ public class Stop {
     double longitude;
     long zoneId;
 
+    public String getName(){
+        return name;
+    }
 
     public static final Func1<Query, List<Stop>> MAP = new Func1<Query, List<Stop>>() {
         @Override public List<Stop> call(Query query) {
