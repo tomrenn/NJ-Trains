@@ -1,16 +1,13 @@
-package com.tomrenn.njtrains.data;
+package com.tomrenn.njtrains.data.api;
 
-import android.app.DownloadManager;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
-import android.support.v4.util.ArrayMap;
 
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.tomrenn.njtrains.data.api.CsvFileObserver;
 import com.tomrenn.njtrains.data.prefs.StringPreference;
 
 import java.io.BufferedInputStream;
@@ -19,8 +16,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -31,7 +26,6 @@ import rx.Subscriber;
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 /**
  * States we need to check.

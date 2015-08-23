@@ -1,4 +1,4 @@
-package com.tomrenn.njtrains.ui;
+package com.tomrenn.njtrains.data;
 
 import com.tomrenn.njtrains.data.db.Stop;
 

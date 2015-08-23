@@ -31,9 +31,9 @@ public final class DbOpenHelper extends SQLiteOpenHelper {
             + Trip.SERVICE_ID +" INTEGER NOT NULL REFERENCES " + ServiceDate.TABLE + "(" + ServiceDate.ID + "),"
             + Trip.ROUTE_ID + " INTEGER NOT NULL,"
             + Trip.HEADSIGN + " TEXT NOT NULL,"
-            + Trip.DIRECTION_ID + " INTEGER NOT NULL,"
-            + Trip.BLOCK_ID + " INTEGER NOT NULL,"
-            + Trip.SHAPE_ID + " INTEGER NOT NULL"
+            + Trip.DIRECTION_ID + " INTEGER NOT NULL DEFAULT 0,"
+            + Trip.BLOCK_ID + " INTEGER NOT NULL DEFAULT 0,"
+            + Trip.SHAPE_ID + " INTEGER NOT NULL DEFAULT 0"
             + ")";
 
     private static final String CREATE_STOP_TIME = ""

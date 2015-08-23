@@ -5,10 +5,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.tomrenn.njtrains.MainActivity;
-import com.tomrenn.njtrains.data.DataModule;
-import com.tomrenn.njtrains.data.NJTDataManager;
 import com.tomrenn.njtrains.data.RootDir;
-import com.tomrenn.njtrains.data.TransitDataManager;
 import com.tomrenn.njtrains.data.prefs.StringPreference;
 import com.tomrenn.njtrains.ui.WelcomeFragment;
 

@@ -1,7 +1,7 @@
 package com.tomrenn.njtrains.ui;
 
-import com.tomrenn.njtrains.MainActivity;
 import com.tomrenn.njtrains.NJTModule;
+import com.tomrenn.njtrains.data.StopLookup;
 
 import dagger.Module;
 import dagger.Provides;
@@ -23,7 +23,8 @@ public class MainActivityModule {
         this.stopLookup = stopLookup;
     }
 
-    @Provides StopLookup provideStopLookup(){
+    @Provides
+    StopLookup provideStopLookup(){
         return stopLookup;
     }
 }

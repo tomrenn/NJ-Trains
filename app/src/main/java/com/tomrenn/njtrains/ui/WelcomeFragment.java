@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.tomrenn.njtrains.Injector;
 import com.tomrenn.njtrains.R;
-import com.tomrenn.njtrains.data.TransitDataManager;
+import com.tomrenn.njtrains.data.api.TransitDataManager;
 
 import javax.inject.Inject;
 

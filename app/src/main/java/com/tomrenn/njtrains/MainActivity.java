@@ -8,11 +8,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.tomrenn.njtrains.data.api.LastUpdated;
-import com.tomrenn.njtrains.data.db.DbOpenHelper;
 import com.tomrenn.njtrains.data.prefs.StringPreference;
 import com.tomrenn.njtrains.ui.MainActivityModule;
 import com.tomrenn.njtrains.ui.MainFragment;
-import com.tomrenn.njtrains.ui.StopLookup;
+import com.tomrenn.njtrains.data.StopLookup;
 import com.tomrenn.njtrains.ui.WelcomeFragment;
 
 import javax.inject.Inject;

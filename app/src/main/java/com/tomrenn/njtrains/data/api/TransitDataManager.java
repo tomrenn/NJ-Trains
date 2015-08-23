@@ -1,4 +1,4 @@
-package com.tomrenn.njtrains.data;
+package com.tomrenn.njtrains.data.api;
 
 import rx.Observable;
 

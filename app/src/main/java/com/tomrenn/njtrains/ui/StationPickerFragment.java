@@ -2,7 +2,6 @@ package com.tomrenn.njtrains.ui;
 
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,8 +17,8 @@ import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 import com.tomrenn.njtrains.Injector;
 import com.tomrenn.njtrains.R;
+import com.tomrenn.njtrains.data.StopLookup;
 import com.tomrenn.njtrains.data.db.Db;
-import com.tomrenn.njtrains.data.db.DbOpenHelper;
 import com.tomrenn.njtrains.data.db.Stop;
 
 import java.util.ArrayList;
@@ -37,7 +36,8 @@ import rx.functions.Func1;
  */
 public class StationPickerFragment extends Fragment {
 
-    @Inject StopLookup stopLookup;
+    @Inject
+    StopLookup stopLookup;
     @Inject SQLiteOpenHelper sqLiteOpenHelper;
     @Bind(R.id.recyclerView) RecyclerView recyclerView;
 
