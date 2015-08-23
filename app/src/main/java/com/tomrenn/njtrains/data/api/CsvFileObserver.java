@@ -1,4 +1,4 @@
-package com.tomrenn.njtrains.data;
+package com.tomrenn.njtrains.data.api;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
@@ -21,12 +21,13 @@ import okio.BufferedSource;
 import okio.Okio;
 import okio.Source;
 import rx.Observer;
+import rx.functions.Action1;
 import timber.log.Timber;
 
 /**
  * Goal of receiving csv files to be inserted into the given database.
  */
-public class CsvFileObserver implements Observer<File> {
+public class CsvFileObserver implements Observer<File>, Action1<File> {
     public static final List<String> TABLES =
             Arrays.asList(Stop.TABLE, StopTime.TABLE, Trip.TABLE);
     private SQLiteDatabase db;
@@ -105,5 +106,10 @@ public class CsvFileObserver implements Observer<File> {
         } catch (IOException e){
             Timber.e(e, "Something bad happened");
         }
+    }
+
+    @Override
+    public void call(File file) {
+        onNext(file);
     }
 }

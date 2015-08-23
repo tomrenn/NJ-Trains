@@ -10,11 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.tomrenn.njtrains.Injector;
 import com.tomrenn.njtrains.R;
+import com.tomrenn.njtrains.data.db.Stop;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.functions.Action1;
 import timber.log.Timber;
 
 /**
@@ -22,7 +27,14 @@ import timber.log.Timber;
  */
 public class MainFragment extends Fragment {
 
+    @Inject StopLookup stopLookup;
+
     @Bind(R.id.fromStation) Button fromStation;
+
+
+    public static MainFragment getInstance(){
+        return new MainFragment();
+    }
 
     @Nullable
     @Override
@@ -35,15 +47,28 @@ public class MainFragment extends Fragment {
     @OnClick({R.id.fromStation, R.id.toStation}) void stationClick(Button button){
         Timber.d("CLICK");
         FragmentManager fm = getFragmentManager();
+
         fm.beginTransaction()
                 .addToBackStack("stationFragment")
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                .replace(R.id.fragmentContainer, new StationPickerFragment())
+                .setCustomAnimations(R.anim.slide_in_right, 0,
+                        0, android.R.anim.slide_out_right)
+                .add(R.id.fragmentContainer, new StationPickerFragment())
                 .commit();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Injector.obtain(getActivity()).inject(this);
+        stopLookup.onChanges()
+                .subscribe(new Action1<StopLookup>() {
+                    @Override
+                    public void call(StopLookup stopLookup) {
+                        Stop fromStop = stopLookup.fromStation();
+                        if (fromStop != null){
+                            fromStation.setText(fromStop.getName());
+                        }
+                    }
+                });
     }
 }

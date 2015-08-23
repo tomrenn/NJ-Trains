@@ -1,32 +1,30 @@
 package com.tomrenn.njtrains;
 
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 
-import com.squareup.okhttp.OkHttpClient;
-
-import java.io.File;
-
-import com.tomrenn.njtrains.data.CsvFileObserver;
-import com.tomrenn.njtrains.data.RailData;
+import com.tomrenn.njtrains.data.api.LastUpdated;
 import com.tomrenn.njtrains.data.db.DbOpenHelper;
+import com.tomrenn.njtrains.data.prefs.StringPreference;
+import com.tomrenn.njtrains.ui.MainActivityModule;
 import com.tomrenn.njtrains.ui.MainFragment;
-import com.tomrenn.njtrains.ui.StationPickerFragment;
+import com.tomrenn.njtrains.ui.StopLookup;
+import com.tomrenn.njtrains.ui.WelcomeFragment;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
+import javax.inject.Inject;
+
+import dagger.ObjectGraph;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
+
+    @Inject @LastUpdated StringPreference lastUpdated;
+
+    ObjectGraph activityGraph;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,30 +33,32 @@ public class MainActivity extends AppCompatActivity {
 
         Timber.plant(new Timber.DebugTree());
 
-        OkHttpClient httpClient = new OkHttpClient();
-        File rootDir = getExternalFilesDir(null);
-        RailData railData = new RailData(httpClient, rootDir);
+        ObjectGraph appGraph = Injector.obtain(getApplicationContext());
+        appGraph.inject(this);
+        activityGraph = appGraph.plus(new MainActivityModule(new StopLookup()));
 
-        File zipFile = new File(rootDir, "railData.zip");
-        File dataDir = new File(rootDir, "railData");
 
-        // todo: make splash screen with loading text
-        // -- downloading trains
-        // -- reading train data
-        DbOpenHelper helper = new DbOpenHelper(this);
+        Fragment startFragment;
+
+        if (lastUpdated.isSet()){
+            startFragment = MainFragment.getInstance();
+        } else {
+            startFragment = WelcomeFragment.getInstance();
+        }
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.fragmentContainer, new MainFragment())
+                .add(R.id.fragmentContainer, startFragment)
                 .commit();
-
-
-        railData.getRailDataZip(RailData.TMP_URL, zipFile)
-                .flatMapObservable(RailData.unzipRailData(dataDir))
-                .subscribeOn(Schedulers.io())
-                .subscribe(new CsvFileObserver(helper.getWritableDatabase()));
     }
 
+    @Override
+    public Object getSystemService(@NonNull String name) {
+        if (Injector.matchesService(name)){
+            return activityGraph;
+        }
+        return super.getSystemService(name);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
