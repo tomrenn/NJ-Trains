@@ -1,8 +1,10 @@
 package com.tomrenn.njtrains.data.api;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.google.common.collect.Lists;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 import com.tomrenn.njtrains.BuildConfig;
@@ -13,10 +15,24 @@ import com.tomrenn.njtrains.data.db.Trip;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.matchers.JUnitMatchers;
+import org.junit.runner.JUnitCore;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+
+import java.util.Collections;
+import java.util.List;
+
+import rx.Observable;
+import rx.observers.TestObserver;
+
+import static org.assertj.android.api.Assertions.assertThat;
+
+import static com.squareup.sqlbrite.SqlBrite.Query;
+import static com.tomrenn.njtrains.data.db.Utils.*;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -27,6 +43,13 @@ public class TripFinderTest {
 
     NJTripFinder tripFinder;
     BriteDatabase db;
+
+    int RAHWAY_STOP_ID = 127;
+    int NYP_STOP_ID = 105;
+
+    int TRIP1 = 44;
+    int TRIP2 = 55;
+    int TRIP3 = 77;
 
 
     @Before public void setup(){
@@ -40,57 +63,41 @@ public class TripFinderTest {
     void sampleData(){
         int NE_CORRIDER = 8;
 
-        int TRIP1 = 44;
-        int TRIP2 = 55;
+        insertStop(db, RAHWAY_STOP_ID, "RAHWAY");
+        insertStop(db, NYP_STOP_ID, "NYP");
 
-        insertStop(127, "RAHWAY");
-        insertStop(105, "NYP");
+        // to NYC
+        insertStopTime(db, RAHWAY_STOP_ID, TRIP1, 2);
+        insertStopTime(db, NYP_STOP_ID, TRIP1, 8);
+        // to RAHWAY
+        insertStopTime(db, NYP_STOP_ID, TRIP2, 0);
+        insertStopTime(db, RAHWAY_STOP_ID, TRIP2, 6);
 
-        insertStopTime(127, TRIP1, 2);
-        insertStopTime(127, TRIP2, 2);
-
-        insertTrip(1, NE_CORRIDER, TRIP2);
-        insertTrip(2, NE_CORRIDER, 77);
+        insertTrip(db, 0, NE_CORRIDER, TRIP1);
+        insertTrip(db, 1, NE_CORRIDER, TRIP2);
+        insertTrip(db, 2, NE_CORRIDER, TRIP3);
     }
 
-    void insertStop(int id, String name){
-        ContentValues values = new ContentValues();
-        values.put(Stop.ID, id);
-        values.put(Stop.NAME, name);
-        values.put(Stop.CODE, 0);
-        values.put(Stop.DESCRIPTION, "");
-        values.put(Stop.LATITUDE, 0);
-        values.put(Stop.LONGITUDE, 0);
-        values.put(Stop.ZONE_ID, 0);
+    /** Only Trip 1 goes from Rahway _to_ NYP */
+    @Test
+    public void testFindTrips(){
+        Stop from = new Stop(RAHWAY_STOP_ID, 0, "RAHWAY", "", 0, 0, 0);
+        Stop to = new Stop(NYP_STOP_ID, 0, "NYP", "", 0, 0, 0);
 
-        db.insert(Stop.TABLE, values);
+        List<Trip> trips = tripFinder.findTrips(from, to).toBlocking().first();
+        assertEquals(1, trips.size());
     }
 
-    void insertTrip(int tripId, int routeId, int serviceId){
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(Trip.ID, tripId);
-        contentValues.put(Trip.ROUTE_ID, routeId);
-        contentValues.put(Trip.SERVICE_ID, serviceId);
-        contentValues.put(Trip.HEADSIGN, "");
-
-        db.insert(Trip.TABLE, contentValues);
-    }
-
-    void insertStopTime(int stopId, int tripId, int stopSequence){
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(StopTime.STOP_ID, stopId);
-        contentValues.put(StopTime.TRIP_ID, tripId);
-        contentValues.put(StopTime.SEQUENCE, stopSequence);
-        contentValues.put(StopTime.ARRIVAL, "8am");
-        contentValues.put(StopTime.DEPARTURE, "8am");
-        contentValues.put(StopTime.SHAPE_TRAVELED, 0f);
-
-        db.insert(StopTime.TABLE, contentValues);
-    }
-
-
+    /** Trip 1 and 2 stop at Rahway */
     @Test public void subtripsTest(){
+        List<String> tables = Lists.asList(StopTime.TABLE, new String[]{Trip.TABLE});
+        Observable<Query> query = db.createQuery(
+                tables, NJTripFinder.subTrips,
+                String.valueOf(RAHWAY_STOP_ID));
 
+        Cursor cursor = query.toBlocking().first().run();
+
+        assertThat(cursor).hasCount(2);
     }
 
 }

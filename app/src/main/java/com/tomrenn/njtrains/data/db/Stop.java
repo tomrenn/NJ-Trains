@@ -35,6 +35,8 @@ public class Stop {
     double longitude;
     long zoneId;
 
+    public long id(){ return id; }
+
     public String getName(){
         return name;
     }
