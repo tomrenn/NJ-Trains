@@ -32,13 +32,13 @@ public class Utils {
         db.insert(Trip.TABLE, contentValues);
     }
 
-    public static void insertStopTime(BriteDatabase db, int stopId, int tripId, int stopSequence){
+    public static void insertStopTime(BriteDatabase db, int stopId, int tripId, int stopSequence, String stopTime){
         ContentValues contentValues = new ContentValues();
         contentValues.put(StopTime.STOP_ID, stopId);
         contentValues.put(StopTime.TRIP_ID, tripId);
         contentValues.put(StopTime.SEQUENCE, stopSequence);
-        contentValues.put(StopTime.ARRIVAL, "8am");
-        contentValues.put(StopTime.DEPARTURE, "8am");
+        contentValues.put(StopTime.ARRIVAL, stopTime);
+        contentValues.put(StopTime.DEPARTURE, stopTime);
         contentValues.put(StopTime.SHAPE_TRAVELED, 0f);
 
         db.insert(StopTime.TABLE, contentValues);

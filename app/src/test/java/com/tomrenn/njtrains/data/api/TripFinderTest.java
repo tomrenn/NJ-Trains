@@ -67,11 +67,11 @@ public class TripFinderTest {
         insertStop(db, NYP_STOP_ID, "NYP");
 
         // to NYC
-        insertStopTime(db, RAHWAY_STOP_ID, TRIP1, 2);
-        insertStopTime(db, NYP_STOP_ID, TRIP1, 8);
+        insertStopTime(db, RAHWAY_STOP_ID, TRIP1, 2, "7:27am");
+        insertStopTime(db, NYP_STOP_ID, TRIP1, 8, "8:08am");
         // to RAHWAY
-        insertStopTime(db, NYP_STOP_ID, TRIP2, 0);
-        insertStopTime(db, RAHWAY_STOP_ID, TRIP2, 6);
+        insertStopTime(db, NYP_STOP_ID, TRIP2, 0, "5:32pm");
+        insertStopTime(db, RAHWAY_STOP_ID, TRIP2, 6, "6:12pm");
 
         insertTrip(db, 0, NE_CORRIDER, TRIP1);
         insertTrip(db, 1, NE_CORRIDER, TRIP2);
@@ -84,7 +84,7 @@ public class TripFinderTest {
         Stop from = new Stop(RAHWAY_STOP_ID, 0, "RAHWAY", "", 0, 0, 0);
         Stop to = new Stop(NYP_STOP_ID, 0, "NYP", "", 0, 0, 0);
 
-        List<Trip> trips = tripFinder.findTrips(from, to).toBlocking().first();
+        List<TripResult> trips = tripFinder.findTrips(from, to).toBlocking().first();
         assertEquals(1, trips.size());
     }
 

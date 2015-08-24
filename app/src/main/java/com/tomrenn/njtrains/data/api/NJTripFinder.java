@@ -59,27 +59,29 @@ public class NJTripFinder implements TripFinder {
     }
 
     @Override
-    public Observable<List<Trip>> findTrips(final Stop from, final Stop destination) {
+    public Observable<List<TripResult>> findTrips(final Stop from, final Stop destination) {
 
-        return Observable.create(new Observable.OnSubscribe<List<Trip>>() {
+        return Observable.create(new Observable.OnSubscribe<List<TripResult>>() {
             @Override
-            public void call(Subscriber<? super List<Trip>> subscriber) {
+            public void call(Subscriber<? super List<TripResult>> subscriber) {
                 String subquery = makeshiftSubquery(from);
                 String subqueryB = makeshiftSubquery(destination);
-                String query = "SELECT * "
+                String query = "SELECT SUB1.departure_time, SUB2.arrival_time "
                         + "FROM ("+subquery+") AS SUB1 "
                         + "INNER JOIN (" + subqueryB + ") AS SUB2 "
                          + "ON SUB1.service_id = SUB2.service_id "
                         + "WHERE SUB1.stop_sequence < SUB2.stop_sequence;";
 
-                Cursor cursor = db.query(query, new String[0]);
-                List<Trip> trips = new LinkedList<Trip>();
+                Cursor cursor = db.query(query);
+                List<TripResult> trips = new LinkedList<>();
                 try {
                     while(cursor.moveToNext()){
-                        int id = Db.getInt(cursor, Trip.ID);
-                        int routeId = Db.getInt(cursor, Trip.ROUTE_ID);
-                        int serviceId = Db.getInt(cursor, Trip.SERVICE_ID);
-                        trips.add(new Trip(id, routeId, serviceId, "", 0, 0, 0));
+//                        int id = Db.getInt(cursor, Trip.ID);
+//                        int routeId = Db.getInt(cursor, Trip.ROUTE_ID);
+//                        int serviceId = Db.getInt(cursor, Trip.SERVICE_ID);
+                        String arrival = Db.getString(cursor, "SUB1.departure_time");
+                        String depature = Db.getString(cursor, "SUB2.arrival_time");
+                        trips.add(new TripResult(depature, arrival, ""));
                     }
                 } finally {
                     cursor.close();
