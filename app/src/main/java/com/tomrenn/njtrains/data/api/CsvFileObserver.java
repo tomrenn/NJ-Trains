@@ -1,9 +1,13 @@
 package com.tomrenn.njtrains.data.api;
 
 import android.content.ContentValues;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.os.HandlerThread;
 
+import com.tomrenn.njtrains.data.db.Route;
+import com.tomrenn.njtrains.data.db.ServiceDate;
 import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.data.db.StopTime;
 import com.tomrenn.njtrains.data.db.Trip;
@@ -29,7 +33,8 @@ import timber.log.Timber;
  */
 public class CsvFileObserver implements Observer<File>, Action1<File> {
     public static final List<String> TABLES =
-            Arrays.asList(Stop.TABLE, StopTime.TABLE, Trip.TABLE);
+            Arrays.asList(Stop.TABLE, StopTime.TABLE, Trip.TABLE, ServiceDate.TABLE, Route.TABLE);
+
     private SQLiteDatabase db;
 
     public CsvFileObserver(SQLiteDatabase db) {
@@ -64,40 +69,38 @@ public class CsvFileObserver implements Observer<File>, Action1<File> {
         try {
             fileSource = Okio.buffer(Okio.source(file));
             StringBuilder strBuilder = new StringBuilder("INSERT INTO " + tableName + " (");
-            String str1 = null;
+
+            SQLiteStatement sqLiteStatement = null;
 
             db.beginTransaction();
             while (!fileSource.exhausted()){
                 String line = fileSource.readUtf8Line();
-                if (str1 == null){
+                // first line
+                if (sqLiteStatement == null){
+                    int numArgs = line.split(",").length;
                     strBuilder.append(line) // the column order
                             .append(") values(");
-                    str1 = strBuilder.toString();
-                    continue;
-                } else {
-                    strBuilder = new StringBuilder(str1);
-                }
-//                if (tableName.equals(StopTime.TABLE)){
-                    // arrival time and departure time have colons (:) in them that must be quoted.
-                    String[] values = line.split(",");
-                    StringBuilder rowBuilder = new StringBuilder(line.length());
-                    for (int i=0; i<values.length; i++){
-                        String value = values[i];
-                        if (i > 0){
-                            rowBuilder.append(",");
-                        }
-                        if (value.contains(":")){
-                            rowBuilder.append("\"").append(value).append("\"");
-                        } else if (value.isEmpty()) {
-                            rowBuilder.append("\"\"");
-                        } else {
-                            rowBuilder.append(value);
-                        }
+                    for (int i = 0; i < numArgs; i++) {
+                        strBuilder.append("?,");
                     }
-                    line = rowBuilder.toString();
-//                }
-                strBuilder.append(line).append(");");
-                db.execSQL(strBuilder.toString());
+                    // delete last comma ','
+                    strBuilder.deleteCharAt(strBuilder.length() - 1);
+                    strBuilder.append(")");
+                    sqLiteStatement = db.compileStatement(strBuilder.toString());
+                    continue;
+                }
+                String[] values = line.split(",");
+                for (int i=0; i<values.length; i++){
+                    String value = values[i];
+                    // we could optimize this a little, only StopTime.arrival/StopTime.departure have colons
+//                    if (value.contains(":")){
+//                        value = "\"" + value + "\"";
+//                    } else if (value.isEmpty()){
+//                        value = "\"\"";
+//                    }
+                    sqLiteStatement.bindString(i+1, value);
+                }
+                sqLiteStatement.executeInsert();
                 numInserted++;
             }
             db.setTransactionSuccessful();

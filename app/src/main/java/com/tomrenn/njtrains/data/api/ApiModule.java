@@ -4,7 +4,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.squareup.okhttp.OkHttpClient;
-import com.tomrenn.njtrains.MainActivity;
+import com.tomrenn.njtrains.ui.MainActivity;
 import com.tomrenn.njtrains.data.RootDir;
 import com.tomrenn.njtrains.data.prefs.StringPreference;
 import com.tomrenn.njtrains.ui.WelcomeFragment;
@@ -29,6 +29,10 @@ public class ApiModule {
     @Provides @LastUpdated
     StringPreference provideLastUpdated(SharedPreferences prefs){
         return new StringPreference(prefs, "data.api.lastUpdated");
+    }
+
+    @Provides TripFinder provideTripFinder(NJTripFinder tripFinder){
+        return tripFinder;
     }
 
     @Provides

@@ -73,9 +73,9 @@ public class TripFinderTest {
         insertStopTime(db, NYP_STOP_ID, TRIP2, 0, "5:32pm");
         insertStopTime(db, RAHWAY_STOP_ID, TRIP2, 6, "6:12pm");
 
-        insertTrip(db, 0, NE_CORRIDER, TRIP1);
-        insertTrip(db, 1, NE_CORRIDER, TRIP2);
-        insertTrip(db, 2, NE_CORRIDER, TRIP3);
+        insertTrip(db, TRIP1, NE_CORRIDER, 0);
+        insertTrip(db, TRIP2, NE_CORRIDER, 1);
+        insertTrip(db, TRIP3, NE_CORRIDER, 2);
     }
 
     /** Only Trip 1 goes from Rahway _to_ NYP */
@@ -84,7 +84,8 @@ public class TripFinderTest {
         Stop from = new Stop(RAHWAY_STOP_ID, 0, "RAHWAY", "", 0, 0, 0);
         Stop to = new Stop(NYP_STOP_ID, 0, "NYP", "", 0, 0, 0);
 
-        List<TripResult> trips = tripFinder.findTrips(from, to).toBlocking().first();
+        TripRequest request = new TripRequest(from, to);
+        List<TripResult> trips = tripFinder.findTrips(request).toBlocking().first();
         assertEquals(1, trips.size());
     }
 

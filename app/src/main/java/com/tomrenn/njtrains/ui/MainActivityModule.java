@@ -1,7 +1,8 @@
 package com.tomrenn.njtrains.ui;
 
 import com.tomrenn.njtrains.NJTModule;
-import com.tomrenn.njtrains.data.StopLookup;
+import com.tomrenn.njtrains.data.api.TripRequest;
+import com.tomrenn.njtrains.ui.stationpicker.StationPickerFragment;
 
 import dagger.Module;
 import dagger.Provides;
@@ -17,14 +18,14 @@ import dagger.Provides;
     }
 )
 public class MainActivityModule {
-    StopLookup stopLookup;
+    TripRequest tripRequest;
 
-    public MainActivityModule(StopLookup stopLookup){
-        this.stopLookup = stopLookup;
+    public MainActivityModule(TripRequest tripRequest){
+        this.tripRequest = tripRequest;
     }
 
     @Provides
-    StopLookup provideStopLookup(){
-        return stopLookup;
+    TripRequest provideStopLookup(){
+        return tripRequest;
     }
 }

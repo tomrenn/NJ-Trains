@@ -18,11 +18,22 @@ public final class DbOpenHelper extends SQLiteOpenHelper {
             + Stop.ZONE_ID + " INTEGER NOT NULL"
             + ")";
 
+    public static final String CREATE_ROUTE = ""
+            + "CREATE TABLE " + Route.TABLE + "("
+            + Route.ID + " INTEGER NOT NULL PRIMARY KEY,"
+            + Route.AGENCY_ID + " TEXT NOT NULL,"
+            + Route.SHORT_NAME + " TEXT NOT NULL,"
+            + Route.LONG_NAME + " TEXT NOT NULL,"
+            + Route.ROUTE_TYPE + " INTEGER NOT NULL DEFAULT 0,"
+            + Route.URL + " TEXT NOT NULL,"
+            + Route.COLOR + " INTEGER"
+            + ")";
+
     public static final String CREATE_SERVICE_DATE = ""
             + "CREATE TABLE " + ServiceDate.TABLE + "("
-            + ServiceDate.ID + "INTEGER NOT NULL PRIMARY KEY,"
-            + ServiceDate.DATE + "TEXT NOT NULL,"
-            + ServiceDate.EXCEPTION_TYPE + "INTEGER NOT NULL"
+            + ServiceDate.ID + " INTEGER NOT NULL,"
+            + ServiceDate.DATE + " TEXT NOT NULL,"
+            + ServiceDate.EXCEPTION_TYPE + " INTEGER NOT NULL"
             + ")";
 
     private static final String CREATE_TRIP = ""
@@ -59,6 +70,7 @@ public final class DbOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_STOP);
+        db.execSQL(CREATE_ROUTE);
         db.execSQL(CREATE_SERVICE_DATE);
         db.execSQL(CREATE_TRIP);
         db.execSQL(CREATE_STOP_TIME);

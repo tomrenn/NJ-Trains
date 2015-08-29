@@ -12,5 +12,5 @@ import rx.Observable;
  */
 public interface TripFinder {
 
-    Observable<List<TripResult>> findTrips(Stop from, Stop destination);
+    Observable<List<TripResult>> findTrips(TripRequest tripRequest);
 }

@@ -1,15 +1,8 @@
 package com.tomrenn.njtrains.data.api;
 
 import android.database.Cursor;
-import android.database.DatabaseUtils;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
-import android.database.sqlite.SQLiteStatement;
-import android.support.v4.database.DatabaseUtilsCompat;
 
-import com.google.common.collect.Lists;
 import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
 import com.tomrenn.njtrains.data.db.Db;
 import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.data.db.StopTime;
@@ -23,8 +16,7 @@ import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.Subscriber;
-
-import static android.database.DatabaseUtils.stringForQuery;
+import timber.log.Timber;
 
 /**
  *   select FOO.service_id
@@ -42,7 +34,7 @@ public class NJTripFinder implements TripFinder {
     static final String subTrips = "SELECT * FROM " + Trip.TABLE
             + " JOIN " + StopTime.TABLE
             + " ON ("
-            + Trip.TABLE+"."+Trip.SERVICE_ID
+            + Trip.TABLE+"."+Trip.ID
             + " = " + StopTime.TABLE+"."+StopTime.TRIP_ID
             + ")"
             + " WHERE " + StopTime.TABLE + "." + StopTime.STOP_ID
@@ -59,28 +51,32 @@ public class NJTripFinder implements TripFinder {
     }
 
     @Override
-    public Observable<List<TripResult>> findTrips(final Stop from, final Stop destination) {
+    public Observable<List<TripResult>> findTrips(final TripRequest tripRequest) {
 
         return Observable.create(new Observable.OnSubscribe<List<TripResult>>() {
             @Override
             public void call(Subscriber<? super List<TripResult>> subscriber) {
-                String subquery = makeshiftSubquery(from);
-                String subqueryB = makeshiftSubquery(destination);
-                String query = "SELECT SUB1.departure_time, SUB2.arrival_time "
+                String subquery = makeshiftSubquery(tripRequest.getToStation());
+                String subqueryB = makeshiftSubquery(tripRequest.getFromStation());
+                String query = "SELECT SUB1.departure_time as departure_time, SUB2.arrival_time as arrival_time "
                         + "FROM ("+subquery+") AS SUB1 "
                         + "INNER JOIN (" + subqueryB + ") AS SUB2 "
                          + "ON SUB1.service_id = SUB2.service_id "
                         + "WHERE SUB1.stop_sequence < SUB2.stop_sequence;";
 
+//                Cursor one = db.query("select * from stops");
+//                Cursor two = db.query("select * from stop_times");
+//                Cursor three = db.query("select * from trips");
                 Cursor cursor = db.query(query);
+                Timber.d("ResultCount " + cursor.getCount());
                 List<TripResult> trips = new LinkedList<>();
                 try {
                     while(cursor.moveToNext()){
 //                        int id = Db.getInt(cursor, Trip.ID);
 //                        int routeId = Db.getInt(cursor, Trip.ROUTE_ID);
 //                        int serviceId = Db.getInt(cursor, Trip.SERVICE_ID);
-                        String arrival = Db.getString(cursor, "SUB1.departure_time");
-                        String depature = Db.getString(cursor, "SUB2.arrival_time");
+                        String arrival = Db.getString(cursor, "departure_time");
+                        String depature = Db.getString(cursor, "arrival_time");
                         trips.add(new TripResult(depature, arrival, ""));
                     }
                 } finally {

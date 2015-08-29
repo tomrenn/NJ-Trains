@@ -1,4 +1,4 @@
-package com.tomrenn.njtrains;
+package com.tomrenn.njtrains.ui;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.tomrenn.njtrains.Injector;
+import com.tomrenn.njtrains.R;
 import com.tomrenn.njtrains.data.api.LastUpdated;
+import com.tomrenn.njtrains.data.api.TripRequest;
 import com.tomrenn.njtrains.data.prefs.StringPreference;
 import com.tomrenn.njtrains.ui.MainActivityModule;
 import com.tomrenn.njtrains.ui.MainFragment;
@@ -25,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     ObjectGraph activityGraph;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,11 +38,9 @@ public class MainActivity extends AppCompatActivity {
 
         ObjectGraph appGraph = Injector.obtain(getApplicationContext());
         appGraph.inject(this);
-        activityGraph = appGraph.plus(new MainActivityModule(new StopLookup()));
-
+        activityGraph = appGraph.plus(new MainActivityModule(new TripRequest(null, null)));
 
         Fragment startFragment;
-
         if (lastUpdated.isSet()){
             startFragment = MainFragment.getInstance();
         } else {

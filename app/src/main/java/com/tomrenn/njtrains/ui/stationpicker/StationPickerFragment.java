@@ -1,10 +1,11 @@
-package com.tomrenn.njtrains.ui;
+package com.tomrenn.njtrains.ui.stationpicker;
 
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +18,7 @@ import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 import com.tomrenn.njtrains.Injector;
 import com.tomrenn.njtrains.R;
-import com.tomrenn.njtrains.data.StopLookup;
+import com.tomrenn.njtrains.data.api.TripRequest;
 import com.tomrenn.njtrains.data.db.Db;
 import com.tomrenn.njtrains.data.db.Stop;
 
@@ -35,11 +36,15 @@ import rx.functions.Func1;
  *
  */
 public class StationPickerFragment extends Fragment {
+    public static final String STATION_ACTION = "stationAction";
+    public static final int FROM_STATION = 0;
+    public static final int TO_STATION = 1;
 
-    @Inject
-    StopLookup stopLookup;
+    @Inject TripRequest tripRequest;
     @Inject SQLiteOpenHelper sqLiteOpenHelper;
     @Bind(R.id.recyclerView) RecyclerView recyclerView;
+
+    @VisibleForTesting int stationAction;
 
 
     private static final String LIST_QUERY = "SELECT * FROM "
@@ -48,8 +53,12 @@ public class StationPickerFragment extends Fragment {
             + Stop.NAME
             + " ASC";
 
-    public static StationPickerFragment getInstance(){
-        return new StationPickerFragment();
+    public static StationPickerFragment getInstance(int action){
+        Bundle args = new Bundle();
+        args.putInt(STATION_ACTION, action);
+        StationPickerFragment frag = new StationPickerFragment();
+        frag.setArguments(args);
+        return frag;
     }
 
     @Override
@@ -59,9 +68,15 @@ public class StationPickerFragment extends Fragment {
         return view;
     }
 
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Bundle args = getArguments();
+        stationAction = args.getInt(STATION_ACTION, -1);
+        if (stationAction == -1){
+            throw new IllegalStateException("Fragment created with correct action");
+        }
         Injector.obtain(getActivity()).inject(this);
         SqlBrite brite = SqlBrite.create();
         BriteDatabase db = brite.wrapDatabaseHelper(sqLiteOpenHelper);
@@ -90,7 +105,11 @@ public class StationPickerFragment extends Fragment {
                     StopAdapter adapter = new StopAdapter(stops, new StopAdapter.StopSelectedListener() {
                         @Override
                         public void onStopSelected(Stop stop) {
-                            stopLookup.from(stop);
+                            if (stationAction == FROM_STATION){
+                                tripRequest.setFromStation(stop);
+                            } else {
+                                tripRequest.setToStation(stop);
+                            }
                             getFragmentManager()
                                     .beginTransaction()
                                     .remove(StationPickerFragment.this)
@@ -103,50 +122,4 @@ public class StationPickerFragment extends Fragment {
             });
     }
 
-    static class StopAdapter extends RecyclerView.Adapter<StopViewHolder> {
-        private List<Stop> stops;
-        private StopSelectedListener stopListener;
-
-        interface StopSelectedListener {
-            void onStopSelected(Stop stop);
-        }
-
-        public StopAdapter(List<Stop> stops, StopSelectedListener stopListener) {
-            this.stops = stops;
-            this.stopListener = stopListener;
-        }
-
-        @Override
-        public StopViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            View view = inflater.inflate(R.layout.station_stop_item, parent, false);
-            return new StopViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(StopViewHolder holder, int position) {
-            final Stop stop = stops.get(position);
-            holder.stopName.setText(stop.getName());
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    stopListener.onStopSelected(stop);
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return stops.size();
-        }
-    }
-
-    static class StopViewHolder extends RecyclerView.ViewHolder {
-        TextView stopName;
-
-        public StopViewHolder(View itemView) {
-            super(itemView);
-            stopName = ButterKnife.findById(itemView, R.id.stopName);
-        }
-    }
 }

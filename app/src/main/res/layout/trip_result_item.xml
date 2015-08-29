@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/result_height"
+    android:padding="16dp"
+    tools:background="#bbbbbb">
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="7:27 am - 8:08 am"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:focusableInTouchMode="true" />
+
+    <TextView
+        android:id="@+id/departWarning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/time"
+        tools:text="Departs in 5 minutes" />
+
+    <TextView
+        android:id="@+id/serviceLine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        tools:text="Northeast Corridor #3869"/>
+</RelativeLayout>
