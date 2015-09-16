@@ -98,6 +98,11 @@ public class CsvFileObserver implements Observer<File>, Action1<File> {
 //                    } else if (value.isEmpty()){
 //                        value = "\"\"";
 //                    }
+
+                    // for Stop.stop_name which is enclosed in quotes
+                    if (value.startsWith("\"") && value.endsWith("\"")){
+                        value = value.substring(1, value.length()-1);
+                    }
                     sqLiteStatement.bindString(i+1, value);
                 }
                 sqLiteStatement.executeInsert();

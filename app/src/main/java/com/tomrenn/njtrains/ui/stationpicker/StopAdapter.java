@@ -26,6 +26,11 @@ class StopAdapter extends RecyclerView.Adapter<StopViewHolder> {
         this.stopListener = stopListener;
     }
 
+    public void update(List<Stop> stops){
+        this.stops = stops;
+        this.notifyDataSetChanged();
+    }
+
     @Override
     public StopViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
