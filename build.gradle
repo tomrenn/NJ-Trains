@@ -19,5 +19,5 @@ allprojects {
 }
 
 project.ext {
-    supportVersion = '22.2.1'
+    supportVersion = '23.0.1'
 }
