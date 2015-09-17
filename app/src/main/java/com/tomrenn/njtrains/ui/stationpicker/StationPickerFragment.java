@@ -97,6 +97,11 @@ public class StationPickerFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
     Action1<List<Stop>> receiveResults = new Action1<List<Stop>>() {
         @Override
         public void call(List<Stop> stops) {

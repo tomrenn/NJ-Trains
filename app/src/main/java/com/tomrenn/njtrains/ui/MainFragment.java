@@ -38,6 +38,7 @@ import rx.schedulers.Schedulers;
  */
 public class MainFragment extends Fragment {
 
+    @Inject MainCallbacks mainCallbacks;
     @Inject TripFinder tripFinder;
     @Inject TripRequest tripRequest;
 
@@ -81,21 +82,11 @@ public class MainFragment extends Fragment {
     }
 
     @OnClick({R.id.fromStation, R.id.toStation}) void stationClick(Button button){
-        FragmentManager fm = getFragmentManager();
-
-        int action;
         if (button.getId() == R.id.fromStation){
-            action = StationPickerFragment.FROM_STATION;
+            mainCallbacks.pickStationDeparture();
         } else {
-            action = StationPickerFragment.TO_STATION;
+            mainCallbacks.pickStationDestination();
         }
-
-        fm.beginTransaction()
-                .addToBackStack("stationFragment")
-                .setCustomAnimations(R.anim.slide_in_right, 0,
-                        0, android.R.anim.slide_out_right)
-                .add(R.id.fragmentContainer, StationPickerFragment.getInstance(action))
-                .commit();
     }
 
 
