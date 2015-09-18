@@ -3,6 +3,7 @@ package com.tomrenn.njtrains.data.db;
 import android.database.Cursor;
 
 import com.squareup.sqlbrite.SqlBrite;
+import com.tomrenn.njtrains.data.util.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +65,9 @@ public class Stop {
         }
     };
 
+    public String prettyName(){
+        return Strings.capitalizeString(name);
+    }
 
     public Stop(long id, long code, String name, String desc, double latitude, double longitude, long zoneId) {
         this.id = id;

@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding.widget.RxTextView;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 import com.tomrenn.njtrains.Injector;
@@ -25,15 +26,19 @@ import com.tomrenn.njtrains.R;
 import com.tomrenn.njtrains.data.api.TripRequest;
 import com.tomrenn.njtrains.data.db.Db;
 import com.tomrenn.njtrains.data.db.Stop;
+import com.tomrenn.njtrains.ui.MainCallbacks;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -47,15 +52,18 @@ public class StationPickerFragment extends Fragment {
     public static final int FROM_STATION = 0;
     public static final int TO_STATION = 1;
 
+    @Inject MainCallbacks mainCallbacks;
+    @Inject BriteDatabase db;
     @Inject TripRequest tripRequest;
     @Inject SQLiteOpenHelper sqLiteOpenHelper;
+
     @Bind(R.id.search) EditText searchField;
     @Bind(R.id.recyclerView) RecyclerView recyclerView;
 
     @VisibleForTesting int stationAction;
-    BriteDatabase db;
     StopAdapter stopAdapter;
     StopSelectedListener stopSelectedListener;
+    Subscription textChangeSubscription;
 
     private static final String LIST_QUERY = "SELECT * FROM "
             + Stop.TABLE
@@ -78,28 +86,22 @@ public class StationPickerFragment extends Fragment {
         View view = inflater.inflate(R.layout.station_picker, container, false);
         ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        searchField.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                query(s.toString());
-            }
+        List<Stop> emptyList = Collections.emptyList();
+        stopAdapter = new StopAdapter(emptyList);
+        recyclerView.setAdapter(stopAdapter);
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+        textChangeSubscription = RxTextView.textChanges(searchField)
+                .debounce(200, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(executeQuery);
 
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
         return view;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        textChangeSubscription.unsubscribe();
     }
 
     Action1<List<Stop>> receiveResults = new Action1<List<Stop>>() {
@@ -109,27 +111,34 @@ public class StationPickerFragment extends Fragment {
         }
     };
 
-    void query(String query){
-        query = "%" + query + "%";
-        db.createQuery(Stop.TABLE, LIST_QUERY, query)
-                .map(new Func1<SqlBrite.Query, List<Stop>>() {
-                    @Override
-                    public List<Stop> call(SqlBrite.Query query) {
-                        Cursor cursor = query.run();
-                        try {
-                            List<Stop> values = new ArrayList<>(cursor.getCount());
-                            while (cursor.moveToNext()) {
-                                long id = Db.getLong(cursor, Stop.ID);
-                                String name = Db.getString(cursor, Stop.NAME);
-                                values.add(new Stop(id, 0l, name, "", 0, 0, 0));
-                            }
-                            return values;
-                        } finally {
-                            cursor.close();
+    Action1<CharSequence> executeQuery = new Action1<CharSequence>() {
+        @Override
+        public void call(CharSequence query) {
+            query = "%" + query + "%";
+            db.createQuery(Stop.TABLE, LIST_QUERY, query.toString())
+                    .map(new Func1<SqlBrite.Query, List<Stop>>() {
+                        @Override
+                        public List<Stop> call(SqlBrite.Query query) {
+                            return queryToValues(query);
                         }
-                    }
-                })
-                .subscribe(receiveResults);
+                    })
+                    .subscribe(receiveResults);
+        }
+    };
+
+    public List<Stop> queryToValues(SqlBrite.Query query) {
+        Cursor cursor = query.run();
+        try {
+            List<Stop> values = new ArrayList<>(cursor.getCount());
+            while (cursor.moveToNext()) {
+                long id = Db.getLong(cursor, Stop.ID);
+                String name = Db.getString(cursor, Stop.NAME);
+                values.add(new Stop(id, 0l, name, "", 0, 0, 0));
+            }
+            return values;
+        } finally {
+            cursor.close();
+        }
     }
 
     @Override
@@ -141,26 +150,18 @@ public class StationPickerFragment extends Fragment {
             throw new IllegalStateException("Fragment created with correct action");
         }
         Injector.obtain(getActivity()).inject(this);
-        SqlBrite brite = SqlBrite.create();
-        db = brite.wrapDatabaseHelper(sqLiteOpenHelper);
-        stopSelectedListener = new StopSelectedListener() {
+
+        stopAdapter.setStopSelectedListener(new StopSelectedListener() {
             @Override
             public void onStopSelected(Stop stop) {
                 if (stationAction == FROM_STATION){
-                    tripRequest.setFromStation(stop);
+                    mainCallbacks.selectedDeparture(stop);
                 } else {
-                    tripRequest.setToStation(stop);
+                    mainCallbacks.selectedDestination(stop);
                 }
-                getFragmentManager()
-                        .beginTransaction()
-                        .remove(StationPickerFragment.this)
-                        .commit();
             }
-        };
-        List<Stop> emptyList = Collections.emptyList();
-        stopAdapter = new StopAdapter(emptyList, stopSelectedListener);
-        recyclerView.setAdapter(stopAdapter);
-        query("");
+        });
+        executeQuery.call("");
     }
 
 

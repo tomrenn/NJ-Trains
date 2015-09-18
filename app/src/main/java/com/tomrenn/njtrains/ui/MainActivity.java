@@ -12,6 +12,7 @@ import com.tomrenn.njtrains.Injector;
 import com.tomrenn.njtrains.R;
 import com.tomrenn.njtrains.data.api.LastUpdated;
 import com.tomrenn.njtrains.data.api.TripRequest;
+import com.tomrenn.njtrains.data.api.TripResult;
 import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.data.prefs.StringPreference;
 import com.tomrenn.njtrains.ui.MainActivityModule;
@@ -26,11 +27,11 @@ import dagger.ObjectGraph;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements MainCallbacks {
-
-    public static final String STATION_PICK_FRAGMENT = "stationPicker";
     @Inject @LastUpdated StringPreference lastUpdated;
 
+
     ObjectGraph activityGraph;
+    TripRequest tripResult;
 
 
     @Override
@@ -42,7 +43,9 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
 
         ObjectGraph appGraph = Injector.obtain(getApplicationContext());
         appGraph.inject(this);
-        activityGraph = appGraph.plus(new MainActivityModule(this, new TripRequest(null, null)));
+
+        tripResult = new TripRequest(null, null);
+        activityGraph = appGraph.plus(new MainActivityModule(this, tripResult));
 
         FragmentManager fm = getSupportFragmentManager();
         Fragment startFragment = fm.findFragmentById(R.id.fragmentContainer);
@@ -72,18 +75,13 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
@@ -108,7 +106,8 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
 
     @Override
     public void selectedDeparture(Stop stop) {
-
+        tripResult.setFromStation(stop);
+        getSupportFragmentManager().popBackStack();
     }
 
     @Override
@@ -118,6 +117,8 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
 
     @Override
     public void selectedDestination(Stop stop) {
-
+        tripResult.setToStation(stop);
+        getSupportFragmentManager().popBackStack();
     }
+
 }

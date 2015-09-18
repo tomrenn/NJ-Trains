@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +44,7 @@ public class MainFragment extends Fragment {
     @Inject TripFinder tripFinder;
     @Inject TripRequest tripRequest;
 
+    @Bind(R.id.toolbar) Toolbar toolbar;
     @Bind(R.id.results) RecyclerView results;
     @Bind(R.id.fromStation) Button fromStationBtn;
     @Bind(R.id.toStation) Button toStationBtn;
@@ -94,6 +97,8 @@ public class MainFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Injector.obtain(getActivity()).inject(this);
+        // todo: don't leave this here.
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         results.setLayoutManager(new LinearLayoutManager(getActivity()));
 
 
