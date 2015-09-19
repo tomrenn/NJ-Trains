@@ -2,6 +2,7 @@
 <resources>
     <color name="alternateColor">#34495e</color>
     <color name="colorAccent">#607d8b</color>
+    <color name="colorPrimaryLight">#875ad7</color>
     <color name="colorPrimary">#673ab7</color>
     <color name="colorPrimaryDark">#502da8</color>
     <color name="foreground_material_light">#000000</color>

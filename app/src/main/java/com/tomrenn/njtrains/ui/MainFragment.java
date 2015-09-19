@@ -56,10 +56,10 @@ public class MainFragment extends Fragment {
             Stop toStation = tripRequest.getToStation();
 
             if (fromStation != null){
-                fromStationBtn.setText(tripRequest.getFromStation().getName());
+                fromStationBtn.setText(tripRequest.getFromStation().prettyName());
             }
             if (toStation != null){
-                toStationBtn.setText(tripRequest.getToStation().getName());
+                toStationBtn.setText(tripRequest.getToStation().prettyName());
             }
         }
     };
@@ -90,6 +90,10 @@ public class MainFragment extends Fragment {
         } else {
             mainCallbacks.pickStationDestination();
         }
+    }
+
+    public View getFromStationButton(){
+        return fromStationBtn;
     }
 
 

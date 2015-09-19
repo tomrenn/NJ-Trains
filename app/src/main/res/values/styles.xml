@@ -5,4 +5,13 @@
        <item name="android:textColor">@color/text_black</item>
    </style>
 
+    <style name="StopStationButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@color/colorPrimaryLight</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Small.Inverse</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingLeft">8dp</item>
+    </style>
+
 </resources>

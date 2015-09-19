@@ -1,49 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".ui.MainActivity">
+    tools:context=".ui.MainActivity"
+    tools:showIn="@layout/fragment_main"
+    >
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:text="Rahway"
         android:id="@+id/fromStation"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/StopStationButton"
+        tools:text="Rahway"
+        android:transitionName="stopField"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:layout_alignParentTop="true"
         android:layout_marginTop="0dp" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="NY Penn"
         android:id="@+id/toStation"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="69dp"
-        android:layout_marginEnd="69dp" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="NY Penn"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_below="@id/fromStation"
+        android:layout_alignLeft="@id/fromStation"
+        android:layout_alignStart="@id/fromStation"
+        android:layout_alignRight="@id/fromStation"
+        android:layout_alignEnd="@id/fromStation"
+        style="@style/StopStationButton" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Today"
+        tools:text="Today"
         android:id="@+id/button3"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_below="@id/toStation"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="35dp" />
+        />
 
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="10:43am"
-        android:id="@+id/button4"
+        tools:text="7:00am"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:layout_alignTop="@+id/button3"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_toRightOf="@+id/button3"
+        android:layout_toEndOf="@+id/button3" />
+
 </RelativeLayout>

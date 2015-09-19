@@ -4,19 +4,22 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/windowBackground">
+    android:background="@color/colorPrimary"
+    >
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:transitionName="stopField"
         android:id="@+id/search"
         android:hint="@string/find_station"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        tools:ignore="UnusedAttribute" />
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="16dp"
-        tools:background="@color/material_blue_grey_800"
         android:id="@+id/recyclerView"/>
+
 </LinearLayout>
