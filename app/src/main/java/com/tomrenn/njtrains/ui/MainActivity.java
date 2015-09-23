@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.transition.ChangeBounds;
 import android.transition.ChangeTransform;
 import android.transition.Explode;
+import android.transition.Fade;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionSet;
@@ -68,10 +69,9 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
                 startFragment = WelcomeFragment.getInstance();
             }
 
-//            ActivityOptionsCompa
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.fragmentContainer, startFragment)
+                    .replace(R.id.fragmentContainer, startFragment)
                     .commit();
         } else {
             if (startFragment instanceof MainFragment){
@@ -117,16 +117,22 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
             TransitionSet transitionSet = new TransitionSet();
             transitionSet.addTransition(new ChangeBounds());
-            transitionSet.addTransition(new ChangeTransform());
 
 //            transitionSet.addTransition(new )
 
 //            fragment.setSharedElementEnterTransition(transitionSet);
 //            fragment.setSharedElementReturnTransition(transitionSet);
+//            Transition slideLeft = TransitionInflater.from(this).
+//                    inflateTransition(android.R.transition.fade);
+
+//            fragment.setEnterTransition(new Fade());
+//            fragment.setExitTransition(new Fade());
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                transitionSet.addTransition(new ChangeTransform());
+
 //                Transition explodeTransform = TransitionInflater.from(this).
-//                        inflateTransition(android.R.transition.s);
+//                        inflateTransition(android.R.transition.explode);
 //                fragment.setEnterTransition(explodeTransform);
             }
         }
@@ -135,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
         // we need to readd the same mainFragment instead of new one?
         getSupportFragmentManager()
                 .beginTransaction()
-//                .addSharedElement(mainFragment.getFromStationButton(), "stopField")
+                .addSharedElement(mainFragment.getFromStationButton(), "stopField")
                 .addToBackStack(null)
                 .add(R.id.fragmentContainer, fragment)
                 .commit();

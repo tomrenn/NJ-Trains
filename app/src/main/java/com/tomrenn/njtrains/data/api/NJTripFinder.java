@@ -38,8 +38,7 @@ public class NJTripFinder implements TripFinder {
             + " = " + StopTime.TABLE+"."+StopTime.TRIP_ID
             + ")"
             + " WHERE " + StopTime.TABLE + "." + StopTime.STOP_ID
-            + "= ? "
-            + "GROUP BY " + Trip.SERVICE_ID;
+            + "= ? ";
 
     @Inject
     public NJTripFinder(BriteDatabase db) {
@@ -56,18 +55,24 @@ public class NJTripFinder implements TripFinder {
         return Observable.create(new Observable.OnSubscribe<List<TripResult>>() {
             @Override
             public void call(Subscriber<? super List<TripResult>> subscriber) {
-                String subquery = makeshiftSubquery(tripRequest.getToStation());
-                String subqueryB = makeshiftSubquery(tripRequest.getFromStation());
                 String query = "SELECT SUB1.departure_time as departure_time, SUB2.arrival_time as arrival_time "
-                        + "FROM ("+subquery+") AS SUB1 "
-                        + "INNER JOIN (" + subqueryB + ") AS SUB2 "
-                         + "ON SUB1.service_id = SUB2.service_id "
-                        + "WHERE SUB1.stop_sequence < SUB2.stop_sequence;";
+                        + "FROM ("+subTrips+") AS SUB1 "
+                        + "INNER JOIN (" + subTrips + ") AS SUB2 "
+                         + "ON SUB1.trip_id = SUB2.trip_id "
+                        + "WHERE SUB1.stop_sequence < SUB2.stop_sequence "
+                        + " AND SUB1.service_id=4 "
+                        + "ORDER BY departure_time;";
 
 //                Cursor one = db.query("select * from stops");
 //                Cursor two = db.query("select * from stop_times");
 //                Cursor three = db.query("select * from trips");
-                Cursor cursor = db.query(query);
+                String fromStation = Long.toString(tripRequest.getFromStation().id());
+                String toStation = Long.toString(tripRequest.getToStation().id());
+                Timber.d("FROM : " + tripRequest.getFromStation().getName());
+                Timber.d("TO : " + tripRequest.getToStation().getName());
+
+                Cursor cursor = db.query(query, fromStation, toStation);
+
                 Timber.d("ResultCount " + cursor.getCount());
                 List<TripResult> trips = new LinkedList<>();
                 try {
@@ -75,8 +80,8 @@ public class NJTripFinder implements TripFinder {
 //                        int id = Db.getInt(cursor, Trip.ID);
 //                        int routeId = Db.getInt(cursor, Trip.ROUTE_ID);
 //                        int serviceId = Db.getInt(cursor, Trip.SERVICE_ID);
-                        String arrival = Db.getString(cursor, "departure_time");
-                        String depature = Db.getString(cursor, "arrival_time");
+                        String depature = Db.getString(cursor, "departure_time");
+                        String arrival = Db.getString(cursor, "arrival_time");
                         trips.add(new TripResult(depature, arrival, ""));
                     }
                 } finally {
