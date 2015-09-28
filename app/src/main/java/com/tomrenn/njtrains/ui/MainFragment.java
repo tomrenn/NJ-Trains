@@ -1,5 +1,6 @@
 package com.tomrenn.njtrains.ui;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,12 +17,15 @@ import android.widget.Button;
 import com.tomrenn.njtrains.Injector;
 import com.tomrenn.njtrains.R;
 import com.tomrenn.njtrains.data.StopLookup;
+import com.tomrenn.njtrains.data.api.StopFinder;
 import com.tomrenn.njtrains.data.api.TripFinder;
 import com.tomrenn.njtrains.data.api.TripRequest;
 import com.tomrenn.njtrains.data.api.TripResult;
 import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.ui.stationpicker.StationPickerFragment;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -39,41 +43,74 @@ import rx.schedulers.Schedulers;
  *
  */
 public class MainFragment extends Fragment {
+    public static final String STATION_FROM_ID = "fromStationId";
+    public static final String STATION_FROM_NAME = "fromStationName";
+    public static final String STATION_TO_ID = "toStationId";
+    public static final String STATION_TO_NAME = "toStationName";
 
+    public static Calendar calendar;
+
+    static {
+        calendar = Calendar.getInstance();
+    }
+
+    @Inject SharedPreferences sharedPreferences;
     @Inject MainCallbacks mainCallbacks;
+    @Inject StopFinder stopFinder;
     @Inject TripFinder tripFinder;
-    @Inject TripRequest tripRequest;
 
     @Bind(R.id.toolbar) Toolbar toolbar;
     @Bind(R.id.results) RecyclerView results;
     @Bind(R.id.fromStation) Button fromStationBtn;
     @Bind(R.id.toStation) Button toStationBtn;
 
-    Action1<TripRequest> updateTripViews = new Action1<TripRequest>() {
-        @Override
-        public void call(TripRequest tripRequest) {
-            Stop fromStation = tripRequest.getFromStation();
-            Stop toStation = tripRequest.getToStation();
+    Stop fromStation;
+    Stop toStation;
 
-            if (fromStation != null){
-                fromStationBtn.setText(tripRequest.getFromStation().prettyName());
-            }
-            if (toStation != null){
-                toStationBtn.setText(tripRequest.getToStation().prettyName());
-            }
+
+    Action1<Stop> toStationSelection = new Action1<Stop>() {
+        @Override
+        public void call(Stop stop) {
+            toStation = stop;
+            toStationBtn.setText(stop.prettyName());
+            requestIfPossible();
         }
     };
 
-    Func1<TripRequest, Boolean> filterRequestable = new Func1<TripRequest, Boolean>() {
+    Action1<Stop> fromStationSelection = new Action1<Stop>() {
         @Override
-        public Boolean call(TripRequest tripResult) {
-            return tripResult.getFromStation() != null
-                    && tripResult.getToStation() != null;
+        public void call(Stop stop) {
+            fromStation = stop;
+            fromStationBtn.setText(stop.prettyName());
+            requestIfPossible();
         }
     };
+
+    void requestIfPossible(){
+        if (fromStation != null
+                && toStation != null){
+            tripFinder.findTrips(fromStation, toStation)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(handleResults);
+        }
+    }
 
     public static MainFragment getInstance(){
         return new MainFragment();
+    }
+
+
+    @OnClick(R.id.dateButton)
+    void promptDateDialog(){
+        DatePickerDialog dpd = DatePickerDialog.newInstance(
+                null,
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+        
+        dpd.show(getActivity().getFragmentManager(), "");
     }
 
     @Nullable
@@ -86,9 +123,9 @@ public class MainFragment extends Fragment {
 
     @OnClick({R.id.fromStation, R.id.toStation}) void stationClick(Button button){
         if (button.getId() == R.id.fromStation){
-            mainCallbacks.pickStationDeparture();
+            mainCallbacks.pickStationDeparture(fromStationSelection);
         } else {
-            mainCallbacks.pickStationDestination();
+            mainCallbacks.pickStationDestination(toStationSelection);
         }
     }
 
@@ -96,23 +133,49 @@ public class MainFragment extends Fragment {
         return fromStationBtn;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    void restoreStops(Bundle savedInstanceState){
+        restoreStop(STATION_FROM_ID, fromStationSelection);
+        restoreStop(STATION_TO_ID, toStationSelection);
+    }
+
+    void restoreStop(String prefKey, Action1<Stop> action) {
+        long fromId = sharedPreferences.getLong(prefKey, -1);
+        if (fromId >= 0){
+            stopFinder.findStop(fromId)
+                    .subscribe(action);
+        }
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Injector.obtain(getActivity()).inject(this);
+        restoreStops(savedInstanceState);
         // todo: don't leave this here.
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         results.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-
-        Observable<TripRequest> changes = tripRequest.onChanges();
-
-        changes
-                .doOnNext(updateTripViews)
-                .filter(filterRequestable)
-                .subscribe(findResults);
     }
+
+    @Override
+    public void onStop() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if (fromStation != null){
+            editor.putLong(STATION_FROM_ID, fromStation.id());
+        }
+        if (toStation != null) {
+            editor.putLong(STATION_TO_ID, toStation.id());
+        }
+        editor.apply();
+
+        super.onStop();
+    }
+
 
     Action1<List<TripResult>> handleResults = new Action1<List<TripResult>>() {
         @Override
@@ -123,14 +186,4 @@ public class MainFragment extends Fragment {
         }
     };
 
-
-    Action1<TripRequest> findResults = new Action1<TripRequest>() {
-        @Override
-        public void call(TripRequest tripRequest) {
-            tripFinder.findTrips(tripRequest)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(handleResults);
-        }
-    };
 }

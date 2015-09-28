@@ -18,7 +18,7 @@ public class TripRequest {
     ChangeListener changeListener;
     Observable<TripRequest> changes;
 
-    interface ChangeListener{
+    interface ChangeListener {
         void changed();
     }
 

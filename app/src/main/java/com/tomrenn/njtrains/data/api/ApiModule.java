@@ -11,6 +11,8 @@ import com.tomrenn.njtrains.ui.WelcomeFragment;
 
 import java.io.File;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -29,6 +31,10 @@ public class ApiModule {
     @Provides @LastUpdated
     StringPreference provideLastUpdated(SharedPreferences prefs){
         return new StringPreference(prefs, "data.api.lastUpdated");
+    }
+
+    @Provides @Singleton StopFinder provideStopFinder(NJTStopFinder stopFinder){
+        return stopFinder;
     }
 
     @Provides TripFinder provideTripFinder(NJTripFinder tripFinder){

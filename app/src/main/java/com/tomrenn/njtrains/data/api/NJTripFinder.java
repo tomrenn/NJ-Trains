@@ -1,6 +1,7 @@
 package com.tomrenn.njtrains.data.api;
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 
 import com.squareup.sqlbrite.BriteDatabase;
 import com.tomrenn.njtrains.data.db.Db;
@@ -50,7 +51,10 @@ public class NJTripFinder implements TripFinder {
     }
 
     @Override
-    public Observable<List<TripResult>> findTrips(final TripRequest tripRequest) {
+    public Observable<List<TripResult>> findTrips(Stop fromStation, Stop toStation) {
+
+        final long fromStationId = fromStation.id();
+        final long toStationId = toStation.id();
 
         return Observable.create(new Observable.OnSubscribe<List<TripResult>>() {
             @Override
@@ -66,10 +70,8 @@ public class NJTripFinder implements TripFinder {
 //                Cursor one = db.query("select * from stops");
 //                Cursor two = db.query("select * from stop_times");
 //                Cursor three = db.query("select * from trips");
-                String fromStation = Long.toString(tripRequest.getFromStation().id());
-                String toStation = Long.toString(tripRequest.getToStation().id());
-                Timber.d("FROM : " + tripRequest.getFromStation().getName());
-                Timber.d("TO : " + tripRequest.getToStation().getName());
+                String fromStation = Long.toString(fromStationId);
+                String toStation = Long.toString(toStationId);
 
                 Cursor cursor = db.query(query, fromStation, toStation);
 

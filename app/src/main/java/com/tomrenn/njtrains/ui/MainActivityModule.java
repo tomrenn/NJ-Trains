@@ -19,10 +19,8 @@ import dagger.Provides;
 )
 public class MainActivityModule {
     MainActivity mainActivity;
-    TripRequest tripRequest;
 
-    public MainActivityModule(MainActivity mainActivity, TripRequest tripRequest){
-        this.tripRequest = tripRequest;
+    public MainActivityModule(MainActivity mainActivity){
         this.mainActivity = mainActivity;
     }
 
@@ -30,8 +28,5 @@ public class MainActivityModule {
         return mainActivity;
     }
 
-    @Provides
-    TripRequest provideStopLookup(){
-        return tripRequest;
-    }
+
 }

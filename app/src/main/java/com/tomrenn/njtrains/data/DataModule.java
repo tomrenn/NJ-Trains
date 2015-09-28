@@ -3,6 +3,7 @@ package com.tomrenn.njtrains.data;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.preference.PreferenceManager;
 
@@ -44,6 +45,10 @@ public class DataModule {
 
     @Provides @Singleton SQLiteOpenHelper provideSQLiteHelper(Application app){
         return new DbOpenHelper(app);
+    }
+
+    @Provides @Singleton SQLiteDatabase providesSQLiteDB(SQLiteOpenHelper sqLiteOpenHelper){
+        return sqLiteOpenHelper.getReadableDatabase();
     }
 
     @Provides @Singleton BriteDatabase provideBriteDatabase(SQLiteOpenHelper sqLiteOpenHelper){

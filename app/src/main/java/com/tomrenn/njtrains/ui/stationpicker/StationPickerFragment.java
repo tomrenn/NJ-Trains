@@ -1,34 +1,24 @@
 package com.tomrenn.njtrains.ui.stationpicker;
 
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
-import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
 import com.tomrenn.njtrains.Injector;
 import com.tomrenn.njtrains.R;
-import com.tomrenn.njtrains.data.api.TripRequest;
-import com.tomrenn.njtrains.data.db.Db;
+import com.tomrenn.njtrains.data.api.StopFinder;
 import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.ui.MainCallbacks;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +30,6 @@ import butterknife.ButterKnife;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
 
 import static com.tomrenn.njtrains.ui.stationpicker.StopAdapter.StopSelectedListener;
 
@@ -53,16 +42,13 @@ public class StationPickerFragment extends Fragment {
     public static final int TO_STATION = 1;
 
     @Inject MainCallbacks mainCallbacks;
-    @Inject BriteDatabase db;
-    @Inject TripRequest tripRequest;
-    @Inject SQLiteOpenHelper sqLiteOpenHelper;
+    @Inject StopFinder stopFinder;
 
     @Bind(R.id.search) EditText searchField;
     @Bind(R.id.recyclerView) RecyclerView recyclerView;
 
     @VisibleForTesting int stationAction;
     StopAdapter stopAdapter;
-    StopSelectedListener stopSelectedListener;
     Subscription textChangeSubscription;
 
     private static final String LIST_QUERY = "SELECT * FROM "
@@ -93,7 +79,7 @@ public class StationPickerFragment extends Fragment {
         textChangeSubscription = RxTextView.textChanges(searchField)
                 .debounce(200, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(executeQuery);
+                .subscribe(findStationStops);
 
         return view;
     }
@@ -111,35 +97,16 @@ public class StationPickerFragment extends Fragment {
         }
     };
 
-    Action1<CharSequence> executeQuery = new Action1<CharSequence>() {
+    Action1<CharSequence> findStationStops = new Action1<CharSequence>() {
         @Override
         public void call(CharSequence query) {
-            query = "%" + query + "%";
-            db.createQuery(Stop.TABLE, LIST_QUERY, query.toString())
-                    .map(new Func1<SqlBrite.Query, List<Stop>>() {
-                        @Override
-                        public List<Stop> call(SqlBrite.Query query) {
-                            return queryToValues(query);
-                        }
-                    })
+            stopFinder.searchStops(query.toString())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(receiveResults);
         }
     };
 
-    public List<Stop> queryToValues(SqlBrite.Query query) {
-        Cursor cursor = query.run();
-        try {
-            List<Stop> values = new ArrayList<>(cursor.getCount());
-            while (cursor.moveToNext()) {
-                long id = Db.getLong(cursor, Stop.ID);
-                String name = Db.getString(cursor, Stop.NAME);
-                values.add(new Stop(id, 0l, name, "", 0, 0, 0));
-            }
-            return values;
-        } finally {
-            cursor.close();
-        }
-    }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -161,7 +128,7 @@ public class StationPickerFragment extends Fragment {
                 }
             }
         });
-        executeQuery.call("");
+        findStationStops.call("");
     }
 
 

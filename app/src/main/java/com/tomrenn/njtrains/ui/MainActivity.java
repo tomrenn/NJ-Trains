@@ -2,6 +2,7 @@ package com.tomrenn.njtrains.ui;
 
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -35,6 +36,7 @@ import com.tomrenn.njtrains.ui.stationpicker.StationPickerFragment;
 import javax.inject.Inject;
 
 import dagger.ObjectGraph;
+import rx.functions.Action1;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements MainCallbacks {
@@ -42,7 +44,8 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
 
     MainFragment mainFragment;
     ObjectGraph activityGraph;
-    TripRequest tripResult;
+    @Nullable Action1<Stop> pendingStopSelection;
+//    TripRequest tripResult;
 
 
     @Override
@@ -55,8 +58,7 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
         ObjectGraph appGraph = Injector.obtain(getApplicationContext());
         appGraph.inject(this);
 
-        tripResult = new TripRequest(null, null);
-        activityGraph = appGraph.plus(new MainActivityModule(this, tripResult));
+        activityGraph = appGraph.plus(new MainActivityModule(this));
 
         FragmentManager fm = getSupportFragmentManager();
         Fragment startFragment = fm.findFragmentById(R.id.fragmentContainer);
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
             if (lastUpdated.isSet()){
                 mainFragment = MainFragment.getInstance();
                 startFragment = mainFragment;
+                mainFragment.setRetainInstance(true);
             } else {
                 startFragment = WelcomeFragment.getInstance();
             }
@@ -107,8 +110,9 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
     }
 
     @Override
-    public void pickStationDeparture() {
-       pickStation(StationPickerFragment.FROM_STATION);
+    public void pickStationDeparture(Action1<Stop> selectAction) {
+        pendingStopSelection = selectAction;
+        pickStation(StationPickerFragment.FROM_STATION);
     }
 
     void pickStation(int action){
@@ -149,18 +153,23 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
 
     @Override
     public void selectedDeparture(Stop stop) {
-        tripResult.setFromStation(stop);
+        if (pendingStopSelection != null){
+            pendingStopSelection.call(stop);
+        }
         getSupportFragmentManager().popBackStack();
     }
 
     @Override
-    public void pickStationDestination() {
+    public void pickStationDestination(Action1<Stop> selectAction) {
+        pendingStopSelection = selectAction;
         pickStation(StationPickerFragment.TO_STATION);
     }
 
     @Override
     public void selectedDestination(Stop stop) {
-        tripResult.setToStation(stop);
+        if (pendingStopSelection != null){
+            pendingStopSelection.call(stop);
+        }
         getSupportFragmentManager().popBackStack();
     }
 

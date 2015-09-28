@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="Today"
-        android:id="@+id/button3"
+        android:id="@+id/dateButton"
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
@@ -56,8 +56,8 @@
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:layout_alignTop="@+id/button3"
-        android:layout_toRightOf="@+id/button3"
-        android:layout_toEndOf="@+id/button3" />
+        android:layout_alignTop="@+id/dateButton"
+        android:layout_toRightOf="@+id/dateButton"
+        android:layout_toEndOf="@+id/dateButton" />
 
 </RelativeLayout>

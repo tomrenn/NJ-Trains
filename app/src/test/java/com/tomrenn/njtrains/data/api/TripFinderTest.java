@@ -1,6 +1,5 @@
 package com.tomrenn.njtrains.data.api;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -15,24 +14,21 @@ import com.tomrenn.njtrains.data.db.Trip;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.matchers.JUnitMatchers;
-import org.junit.runner.JUnitCore;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-import java.util.Collections;
 import java.util.List;
 
 import rx.Observable;
-import rx.observers.TestObserver;
-
-import static org.assertj.android.api.Assertions.assertThat;
 
 import static com.squareup.sqlbrite.SqlBrite.Query;
-import static com.tomrenn.njtrains.data.db.Utils.*;
-import static org.junit.Assert.*;
+import static com.tomrenn.njtrains.data.db.Utils.insertStop;
+import static com.tomrenn.njtrains.data.db.Utils.insertStopTime;
+import static com.tomrenn.njtrains.data.db.Utils.insertTrip;
+import static org.assertj.android.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -85,7 +81,7 @@ public class TripFinderTest {
         Stop to = new Stop(NYP_STOP_ID, 0, "NYP", "", 0, 0, 0);
 
         TripRequest request = new TripRequest(from, to);
-        List<TripResult> trips = tripFinder.findTrips(request).toBlocking().first();
+        List<TripResult> trips = tripFinder.findTrips(from, to).toBlocking().first();
         assertEquals(1, trips.size());
     }
 
