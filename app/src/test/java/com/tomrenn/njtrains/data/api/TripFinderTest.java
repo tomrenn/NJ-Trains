@@ -77,8 +77,8 @@ public class TripFinderTest {
     /** Only Trip 1 goes from Rahway _to_ NYP */
     @Test
     public void testFindTrips(){
-        Stop from = new Stop(RAHWAY_STOP_ID, 0, "RAHWAY", "", 0, 0, 0);
-        Stop to = new Stop(NYP_STOP_ID, 0, "NYP", "", 0, 0, 0);
+        Stop from = Stop.create(RAHWAY_STOP_ID, 0, "RAHWAY", "", 0, 0, 0);
+        Stop to = Stop.create(NYP_STOP_ID, 0, "NYP", "", 0, 0, 0);
 
         TripRequest request = new TripRequest(from, to);
         List<TripResult> trips = tripFinder.findTrips(from, to).toBlocking().first();

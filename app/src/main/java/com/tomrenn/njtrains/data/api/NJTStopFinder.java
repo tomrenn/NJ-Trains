@@ -43,39 +43,6 @@ public class NJTStopFinder implements StopFinder {
         this.db = db;
     }
 
-    Func1<Cursor, List<Stop>> cursorToValues = new Func1<Cursor, List<Stop>>() {
-        @Override
-        public List<Stop> call(Cursor cursor) {
-            try {
-                List<Stop> values = new ArrayList<>(cursor.getCount());
-                while (cursor.moveToNext()) {
-                    long id = Db.getLong(cursor, Stop.ID);
-                    String name = Db.getString(cursor, Stop.NAME);
-                    values.add(new Stop(id, 0l, name, "", 0, 0, 0));
-                }
-                return values;
-            } finally {
-                cursor.close();
-            }
-        }
-    };
-
-    Func1<Cursor, Stop> cursorToValue = new Func1<Cursor, Stop>() {
-        @Override
-        public Stop call(Cursor cursor) {
-            try {
-                Stop station = null;
-                while (cursor.moveToNext()) {
-                    long id = Db.getLong(cursor, Stop.ID);
-                    String name = Db.getString(cursor, Stop.NAME);
-                    station = new Stop(id, 0l, name, "", 0, 0, 0);
-                }
-                return station;
-            } finally {
-                cursor.close();
-            }
-        }
-    };
 
     public Observable<Cursor> execQuery(final String sql, final String... bindArgs){
         return Observable.create(new Observable.OnSubscribe<Cursor>() {
@@ -90,7 +57,7 @@ public class NJTStopFinder implements StopFinder {
     @Override
     public Observable<Stop> findStop(long stopId) {
         return execQuery(LOOKUP_QUERY, Long.toString(stopId))
-                .map(cursorToValue)
+                .map(Stop.cursorToValue)
                 .filter(new Func1<Stop, Boolean>() {
                     @Override
                     public Boolean call(Stop stop) {
@@ -104,7 +71,7 @@ public class NJTStopFinder implements StopFinder {
     public Observable<List<Stop>> searchStops(String name) {
         name = "%" + name + "%";
         return execQuery(LIST_QUERY, name)
-                .map(cursorToValues)
+                .map(Stop.cursorToValues)
                 .subscribeOn(Schedulers.computation());
     }
 
