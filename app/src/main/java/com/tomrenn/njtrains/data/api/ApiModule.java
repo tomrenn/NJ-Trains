@@ -7,6 +7,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.tomrenn.njtrains.ui.MainActivity;
 import com.tomrenn.njtrains.data.RootDir;
 import com.tomrenn.njtrains.data.prefs.StringPreference;
+import com.tomrenn.njtrains.ui.MainFragment;
 import com.tomrenn.njtrains.ui.WelcomeFragment;
 
 import java.io.File;

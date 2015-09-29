@@ -44,9 +44,9 @@ import rx.schedulers.Schedulers;
  */
 public class MainFragment extends Fragment {
     public static final String STATION_FROM_ID = "fromStationId";
-    public static final String STATION_FROM_NAME = "fromStationName";
+    public static final String STATION_FROM = "depaturingStation";
     public static final String STATION_TO_ID = "toStationId";
-    public static final String STATION_TO_NAME = "toStationName";
+    public static final String STATION_TO = "destinationStation";
 
     public static Calendar calendar;
 
@@ -135,12 +135,24 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(STATION_TO, toStation);
+        outState.putParcelable(STATION_FROM, fromStation);
         super.onSaveInstanceState(outState);
     }
 
     void restoreStops(Bundle savedInstanceState){
-        restoreStop(STATION_FROM_ID, fromStationSelection);
-        restoreStop(STATION_TO_ID, toStationSelection);
+        if (savedInstanceState != null){
+            fromStation = savedInstanceState.getParcelable(STATION_FROM);
+        }
+        if (fromStation == null){
+            restoreStop(STATION_FROM_ID, fromStationSelection);
+        }
+        if (savedInstanceState != null){
+            toStation = savedInstanceState.getParcelable(STATION_TO);
+        }
+        if (toStation == null){
+            restoreStop(STATION_TO_ID, toStationSelection);
+        }
     }
 
     void restoreStop(String prefKey, Action1<Stop> action) {
@@ -162,6 +174,7 @@ public class MainFragment extends Fragment {
 
     }
 
+
     @Override
     public void onStop() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -172,7 +185,6 @@ public class MainFragment extends Fragment {
             editor.putLong(STATION_TO_ID, toStation.id());
         }
         editor.apply();
-
         super.onStop();
     }
 
