@@ -17,6 +17,7 @@ import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -92,6 +93,7 @@ public class NJTripFinder implements TripFinder {
                 subscriber.onNext(trips);
                 subscriber.onCompleted();
             }
-        });
+        })
+            .subscribeOn(Schedulers.computation());
     }
 }

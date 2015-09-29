@@ -90,7 +90,6 @@ public class MainFragment extends Fragment {
         if (fromStation != null
                 && toStation != null){
             tripFinder.findTrips(fromStation, toStation)
-                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(handleResults);
         }
