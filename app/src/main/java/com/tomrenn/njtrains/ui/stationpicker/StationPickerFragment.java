@@ -15,6 +15,7 @@ import android.widget.EditText;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.tomrenn.njtrains.Injector;
 import com.tomrenn.njtrains.R;
+import com.tomrenn.njtrains.data.api.Station;
 import com.tomrenn.njtrains.data.api.StopFinder;
 import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.ui.MainCallbacks;
@@ -31,7 +32,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
-import static com.tomrenn.njtrains.ui.stationpicker.StopAdapter.StopSelectedListener;
+import static com.tomrenn.njtrains.ui.stationpicker.StationAdapter.StopSelectedListener;
 
 /**
  *
@@ -48,15 +49,8 @@ public class StationPickerFragment extends Fragment {
     @Bind(R.id.recyclerView) RecyclerView recyclerView;
 
     @VisibleForTesting int stationAction;
-    StopAdapter stopAdapter;
+    StationAdapter stationAdapter;
     Subscription textChangeSubscription;
-
-    private static final String LIST_QUERY = "SELECT * FROM "
-            + Stop.TABLE
-            + " WHERE " + Stop.NAME + " LIKE ?"
-            + " ORDER BY "
-            + Stop.NAME
-            + " ASC";
 
 
     public static StationPickerFragment getInstance(int action){
@@ -72,9 +66,9 @@ public class StationPickerFragment extends Fragment {
         View view = inflater.inflate(R.layout.station_picker, container, false);
         ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        List<Stop> emptyList = Collections.emptyList();
-        stopAdapter = new StopAdapter(emptyList);
-        recyclerView.setAdapter(stopAdapter);
+        List<Station> emptyList = Collections.emptyList();
+        stationAdapter = new StationAdapter(emptyList);
+        recyclerView.setAdapter(stationAdapter);
 
         textChangeSubscription = RxTextView.textChanges(searchField)
                 .debounce(200, TimeUnit.MILLISECONDS)
@@ -90,17 +84,17 @@ public class StationPickerFragment extends Fragment {
         textChangeSubscription.unsubscribe();
     }
 
-    Action1<List<Stop>> receiveResults = new Action1<List<Stop>>() {
+    Action1<List<Station>> receiveResults = new Action1<List<Station>>() {
         @Override
-        public void call(List<Stop> stops) {
-            stopAdapter.update(stops);
+        public void call(List<Station> stops) {
+            stationAdapter.update(stops);
         }
     };
 
     Action1<CharSequence> findStationStops = new Action1<CharSequence>() {
         @Override
         public void call(CharSequence query) {
-            stopFinder.searchStops(query.toString())
+            stopFinder.searchStations(query.toString())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(receiveResults);
         }
@@ -118,7 +112,7 @@ public class StationPickerFragment extends Fragment {
         }
         Injector.obtain(getActivity()).inject(this);
 
-        stopAdapter.setStopSelectedListener(new StopSelectedListener() {
+        stationAdapter.setStopSelectedListener(new StopSelectedListener() {
             @Override
             public void onStopSelected(Stop stop) {
                 if (stationAction == FROM_STATION){

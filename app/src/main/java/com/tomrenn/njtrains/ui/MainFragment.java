@@ -25,6 +25,9 @@ import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.ui.stationpicker.StationPickerFragment;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
+import org.threeten.bp.Clock;
+import org.threeten.bp.LocalDate;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -54,6 +57,7 @@ public class MainFragment extends Fragment {
         calendar = Calendar.getInstance();
     }
 
+    @Inject Clock clock;
     @Inject SharedPreferences sharedPreferences;
     @Inject MainCallbacks mainCallbacks;
     @Inject StopFinder stopFinder;
@@ -89,7 +93,7 @@ public class MainFragment extends Fragment {
     void requestIfPossible(){
         if (fromStation != null
                 && toStation != null){
-            tripFinder.findTrips(fromStation, toStation)
+            tripFinder.findTrips(LocalDate.now(clock), fromStation, toStation)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(handleResults);
         }

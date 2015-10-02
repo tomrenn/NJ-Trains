@@ -76,6 +76,14 @@ public class NJTStopFinder implements StopFinder {
     }
 
     @Override
+    public Observable<List<Station>> searchStations(String name) {
+        name = "%" + name + "%";
+        return execQuery(Station.LOOKUP_QUERY, name)
+                .map(Station.cursorToValue)
+                .subscribeOn(Schedulers.computation());
+    }
+
+    @Override
     public Observable<List<Stop>> allStops() {
         return null;
     }

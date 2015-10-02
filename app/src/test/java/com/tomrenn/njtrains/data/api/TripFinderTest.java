@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+import org.threeten.bp.LocalDate;
 
 import java.util.List;
 
@@ -81,7 +82,7 @@ public class TripFinderTest {
         Stop to = Stop.create(NYP_STOP_ID, 0, "NYP", "", 0, 0, 0);
 
         TripRequest request = new TripRequest(from, to);
-        List<TripResult> trips = tripFinder.findTrips(from, to).toBlocking().first();
+        List<TripResult> trips = tripFinder.findTrips(LocalDate.now(), from, to).toBlocking().first();
         assertEquals(1, trips.size());
     }
 

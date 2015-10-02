@@ -9,6 +9,8 @@ import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.data.db.StopTime;
 import com.tomrenn.njtrains.data.db.Trip;
 
+import org.threeten.bp.LocalDate;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,7 +54,7 @@ public class NJTripFinder implements TripFinder {
     }
 
     @Override
-    public Observable<List<TripResult>> findTrips(Stop fromStation, Stop toStation) {
+    public Observable<List<TripResult>> findTrips(final LocalDate localDate, Stop fromStation, Stop toStation) {
 
         final long fromStationId = fromStation.id();
         final long toStationId = toStation.id();
@@ -85,7 +87,7 @@ public class NJTripFinder implements TripFinder {
 //                        int serviceId = Db.getInt(cursor, Trip.SERVICE_ID);
                         String depature = Db.getString(cursor, "departure_time");
                         String arrival = Db.getString(cursor, "arrival_time");
-                        trips.add(new TripResult(depature, arrival, ""));
+                        trips.add(new TripResult(localDate, depature, arrival, ""));
                     }
                 } finally {
                     cursor.close();

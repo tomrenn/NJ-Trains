@@ -34,6 +34,7 @@ public class TripResultAdapter extends RecyclerView.Adapter<TripResultAdapter.Re
     @Override
     public void onBindViewHolder(ResultViewHolder holder, int position) {
         TripResult result = results.get(position);
+        holder.departureWarning.setText(result.getDuration() + " minutes");
         holder.time.setText(result.departureTime + " - " + result.arrivalTime);
         holder.serviceLine.setText(result.serviceNumber);
     }

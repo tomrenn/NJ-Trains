@@ -14,6 +14,8 @@ import com.tomrenn.njtrains.NJTModule;
 import com.tomrenn.njtrains.data.api.ApiModule;
 import com.tomrenn.njtrains.data.db.DbOpenHelper;
 
+import org.threeten.bp.Clock;
+
 import java.io.File;
 
 import javax.inject.Singleton;
@@ -38,6 +40,10 @@ public class DataModule {
    @Provides @Singleton SharedPreferences provideSharedPreferences(Application app){
        return app.getSharedPreferences("nj_trains", Context.MODE_PRIVATE);
    }
+
+    @Provides @Singleton Clock providesClock(){
+        return Clock.systemDefaultZone();
+    }
 
     @Provides @Singleton OkHttpClient provideOkHttpClient(){
         return new OkHttpClient();

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tomrenn.njtrains.R;
+import com.tomrenn.njtrains.data.api.Station;
 import com.tomrenn.njtrains.data.db.Stop;
 
 import java.util.List;
@@ -14,20 +15,20 @@ import java.util.List;
 /**
  *
  */
-class StopAdapter extends RecyclerView.Adapter<StopViewHolder> {
-    private List<Stop> stops;
+class StationAdapter extends RecyclerView.Adapter<StopViewHolder> {
+    private List<Station> stations;
     private @Nullable StopSelectedListener stopListener;
 
     interface StopSelectedListener {
         void onStopSelected(Stop stop);
     }
 
-    public StopAdapter(List<Stop> stops) {
-        this.stops = stops;
+    public StationAdapter(List<Station> stations) {
+        this.stations = stations;
     }
 
-    public void update(List<Stop> stops){
-        this.stops = stops;
+    public void update(List<Station> stations){
+        this.stations = stations;
         this.notifyDataSetChanged();
     }
 
@@ -44,12 +45,14 @@ class StopAdapter extends RecyclerView.Adapter<StopViewHolder> {
 
     @Override
     public void onBindViewHolder(StopViewHolder holder, int position) {
-        final Stop stop = stops.get(position);
-        holder.stopName.setText(stop.prettyName());
+        final Station station = stations.get(position);
+        holder.stopName.setText(station.prettyName());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (stopListener != null){
+                    Stop stop = Stop.create(station.getStopId(), 0l, station.getName(), "",
+                            0l, 0l, 0l);
                     stopListener.onStopSelected(stop);
                 }
             }
@@ -58,6 +61,6 @@ class StopAdapter extends RecyclerView.Adapter<StopViewHolder> {
 
     @Override
     public int getItemCount() {
-        return stops.size();
+        return stations.size();
     }
 }

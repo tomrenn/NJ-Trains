@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
+import org.threeten.bp.LocalDate;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ import rx.schedulers.Schedulers;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -80,10 +82,11 @@ public class MainFragmentTest {
         doReturn(2l).when(mainFragment.sharedPreferences).getLong(MainFragment.STATION_TO_ID, -1);
         doReturn(Observable.just(rahway)).when(mainFragment.stopFinder).findStop(1);
         doReturn(Observable.just(penn)).when(mainFragment.stopFinder).findStop(2);
-        TripResult result = new TripResult("08:27", "09:08", "4420");
+        TripResult result = new TripResult(null, "08:27", "09:08", "4420");
         mainFragment.tripFinder = spy(mainFragment.tripFinder);
+        LocalDate localDate = LocalDate.now();
         Observable<List<TripResult>> tripResults = Observable.just(singletonList(result));
-        doReturn(tripResults).when(mainFragment.tripFinder).findTrips(rahway, penn);
+        doReturn(tripResults).when(mainFragment.tripFinder).findTrips(localDate, rahway, penn);
 
         mainFragment.restoreStops(null);
 
@@ -91,7 +94,7 @@ public class MainFragmentTest {
         assertEquals(rahway, mainFragment.fromStation);
         assertEquals(penn, mainFragment.toStation);
         // verify fragment displays results
-        verify(mainFragment.tripFinder).findTrips(rahway, penn);
+        verify(mainFragment.tripFinder).findTrips(localDate, rahway, penn);
         assertEquals(1, mainFragment.results.getAdapter().getItemCount());
     }
 }
