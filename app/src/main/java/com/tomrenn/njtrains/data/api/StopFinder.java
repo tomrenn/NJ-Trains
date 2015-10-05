@@ -1,5 +1,6 @@
 package com.tomrenn.njtrains.data.api;
 
+import com.tomrenn.njtrains.data.db.Route;
 import com.tomrenn.njtrains.data.db.Stop;
 
 import java.util.List;
@@ -16,6 +17,8 @@ public interface StopFinder {
     Observable<List<Stop>> searchStops(String name);
 
     Observable<List<Station>> searchStations(String name);
+
+    Observable<List<Route>> allRoutes();
 
     Observable<List<Stop>> allStops();
 }

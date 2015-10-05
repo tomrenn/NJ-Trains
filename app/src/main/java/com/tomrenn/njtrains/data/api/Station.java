@@ -62,9 +62,9 @@ public class Station {
                 long currentStopId = Long.MIN_VALUE;
 
                 while (cursor.moveToNext()) {
-                    long stationId = Db.getLong(cursor, "stop_times.stop_id");
+                    long stationId = Db.getLong(cursor, "stop_id");
                     if (currentStopId == Long.MIN_VALUE){
-                        currentStopName = Db.getString(cursor, "stops.stop_name");
+                        currentStopName = Db.getString(cursor, "stop_name");
                         currentStopId = stationId;
                         stationRoutes.add(getRoute(cursor));
                         continue;
@@ -80,10 +80,17 @@ public class Station {
                         stationRoutes.clear();
 
                         // update current stop info with new stop
-                        currentStopName = Db.getString(cursor, "stops.stop_name");
+                        currentStopName = Db.getString(cursor, "stop_name");
                         currentStopId = stationId;
                         stationRoutes.add(getRoute(cursor));
                     }
+                }
+                // last stop/routes will never be inserted to values
+                // _because_ the stopId will not change triggering the insert
+                if (currentStopId != Long.MIN_VALUE){
+                    Route[] routes = new Route[stationRoutes.size()];
+                    routes = stationRoutes.toArray(routes);
+                    values.add(new Station(currentStopName, currentStopId, routes));
                 }
                 return values;
             } finally {
@@ -93,9 +100,9 @@ public class Station {
     };
 
     static Route getRoute(Cursor cursor){
-        int routeId = Db.getInt(cursor, "trips.route_id");
-        int type = Db.getInt(cursor, "routes.route_type");
-        String name = Db.getString(cursor, "routes.route_long_name");
+        int routeId = Db.getInt(cursor, "route_id");
+        int type = Db.getInt(cursor, "route_type");
+        String name = Db.getString(cursor, "route_long_name");
         return Route.create(routeId, "", name, type);
     }
 

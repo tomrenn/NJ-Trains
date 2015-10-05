@@ -10,15 +10,20 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.tomrenn.njtrains.Injector;
 import com.tomrenn.njtrains.R;
 import com.tomrenn.njtrains.data.api.Station;
 import com.tomrenn.njtrains.data.api.StopFinder;
+import com.tomrenn.njtrains.data.db.Route;
 import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.ui.MainCallbacks;
+import com.tomrenn.njtrains.ui.misc.BindableAdapter;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +51,7 @@ public class StationPickerFragment extends Fragment {
     @Inject StopFinder stopFinder;
 
     @Bind(R.id.search) EditText searchField;
+    @Bind(R.id.routeSpinner) Spinner routeSpinner;
     @Bind(R.id.recyclerView) RecyclerView recyclerView;
 
     @VisibleForTesting int stationAction;
@@ -111,6 +117,42 @@ public class StationPickerFragment extends Fragment {
             throw new IllegalStateException("Fragment created with correct action");
         }
         Injector.obtain(getActivity()).inject(this);
+
+        stopFinder.allRoutes()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<Route>>() {
+                    @Override
+                    public void call(final List<Route> routes) {
+                        BaseAdapter adapter = new BindableAdapter<Route>(getActivity()) {
+                            @Override
+                            public void bindView(Route item, int position, View view) {
+                                TextView tv = ButterKnife.findById(view, android.R.id.text1);
+                                tv.setText(item.getName());
+                            }
+
+                            @Override
+                            public int getCount() {
+                                return routes.size();
+                            }
+
+                            @Override
+                            public Route getItem(int position) {
+                                return routes.get(position);
+                            }
+
+                            @Override
+                            public long getItemId(int position) {
+                                return 0;
+                            }
+
+                            @Override
+                            public View newView(LayoutInflater inflater, int position, ViewGroup container) {
+                                return inflater.inflate(android.R.layout.simple_spinner_item, container, false);
+                            }
+                        };
+                        routeSpinner.setAdapter(adapter);
+                    }
+                });
 
         stationAdapter.setStopSelectedListener(new StopSelectedListener() {
             @Override

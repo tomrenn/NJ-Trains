@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 import com.tomrenn.njtrains.data.db.Db;
+import com.tomrenn.njtrains.data.db.Route;
 import com.tomrenn.njtrains.data.db.Stop;
 
 import java.util.ArrayList;
@@ -16,9 +17,11 @@ import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 /**
  *
@@ -78,8 +81,16 @@ public class NJTStopFinder implements StopFinder {
     @Override
     public Observable<List<Station>> searchStations(String name) {
         name = "%" + name + "%";
+
         return execQuery(Station.LOOKUP_QUERY, name)
                 .map(Station.cursorToValue)
+                .subscribeOn(Schedulers.computation());
+    }
+
+    @Override
+    public Observable<List<Route>> allRoutes() {
+        return execQuery(Route.LOOKUP_QUERY)
+                .map(Route.cursorToValues)
                 .subscribeOn(Schedulers.computation());
     }
 

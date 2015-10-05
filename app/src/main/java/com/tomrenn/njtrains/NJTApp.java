@@ -5,6 +5,7 @@ import android.app.Application;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import dagger.ObjectGraph;
+import timber.log.Timber;
 
 /**
  *
@@ -16,6 +17,7 @@ public class NJTApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Timber.plant(new Timber.DebugTree());
         AndroidThreeTen.init(this);
         objectGraph = ObjectGraph.create(Modules.list(this));
     }

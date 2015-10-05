@@ -4,7 +4,6 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
     >
 
     <EditText
@@ -15,6 +14,11 @@
         android:hint="@string/find_station"
         android:layout_gravity="center_horizontal"
         tools:ignore="UnusedAttribute" />
+
+    <Spinner
+        android:id="@+id/routeSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"

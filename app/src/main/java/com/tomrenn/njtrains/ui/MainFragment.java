@@ -1,8 +1,10 @@
 package com.tomrenn.njtrains.ui;
 
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -146,15 +148,11 @@ public class MainFragment extends Fragment {
     void restoreStops(Bundle savedInstanceState){
         if (savedInstanceState != null){
             fromStation = savedInstanceState.getParcelable(STATION_FROM);
-        }
-        if (fromStation == null){
-            restoreStop(STATION_FROM_ID, fromStationSelection);
+            fromStationSelection.call(fromStation);
         }
         if (savedInstanceState != null){
             toStation = savedInstanceState.getParcelable(STATION_TO);
-        }
-        if (toStation == null){
-            restoreStop(STATION_TO_ID, toStationSelection);
+            toStationSelection.call(toStation);
         }
     }
 
@@ -170,11 +168,28 @@ public class MainFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Injector.obtain(getActivity()).inject(this);
-        restoreStops(savedInstanceState);
+
         // todo: don't leave this here.
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         results.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        if (savedInstanceState != null){
+            restoreStops(savedInstanceState);
+        } else {
+            if (fromStation != null){
+                fromStationSelection.call(fromStation);
+            }
+            if (toStation != null){
+                toStationSelection.call(toStation);
+            }
+        }
+        // restore from preferences
+        if (fromStation == null){
+            restoreStop(STATION_FROM_ID, fromStationSelection);
+        }
+        if (toStation == null){
+            restoreStop(STATION_TO_ID, toStationSelection);
+        }
     }
 
 

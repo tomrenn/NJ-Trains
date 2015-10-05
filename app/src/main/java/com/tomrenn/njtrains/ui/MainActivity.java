@@ -147,16 +147,16 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
                 .beginTransaction()
                 .addSharedElement(mainFragment.getFromStationButton(), "stopField")
                 .addToBackStack(null)
-                .add(R.id.fragmentContainer, fragment)
+                .replace(R.id.fragmentContainer, fragment)
                 .commit();
     }
 
     @Override
     public void selectedDeparture(Stop stop) {
+        getSupportFragmentManager().popBackStack();
         if (pendingStopSelection != null){
             pendingStopSelection.call(stop);
         }
-        getSupportFragmentManager().popBackStack();
     }
 
     @Override
@@ -167,10 +167,10 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
 
     @Override
     public void selectedDestination(Stop stop) {
+        getSupportFragmentManager().popBackStack();
         if (pendingStopSelection != null){
             pendingStopSelection.call(stop);
         }
-        getSupportFragmentManager().popBackStack();
     }
 
 }

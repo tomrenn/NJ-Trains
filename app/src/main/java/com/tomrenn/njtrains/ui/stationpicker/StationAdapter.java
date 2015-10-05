@@ -1,6 +1,7 @@
 package com.tomrenn.njtrains.ui.stationpicker;
 
 import android.support.annotation.Nullable;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.tomrenn.njtrains.R;
 import com.tomrenn.njtrains.data.api.Station;
+import com.tomrenn.njtrains.data.db.Route;
 import com.tomrenn.njtrains.data.db.Stop;
 
 import java.util.List;
@@ -45,7 +47,11 @@ class StationAdapter extends RecyclerView.Adapter<StopViewHolder> {
 
     @Override
     public void onBindViewHolder(StopViewHolder holder, int position) {
+        holder.reset();
         final Station station = stations.get(position);
+        for (Route route : station.getRoutes()){
+            holder.addRouteView(route);
+        }
         holder.stopName.setText(station.prettyName());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
