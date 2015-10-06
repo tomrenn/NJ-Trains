@@ -1,5 +1,6 @@
 package com.tomrenn.njtrains.ui;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.tomrenn.njtrains.BuildConfig;
@@ -74,21 +75,22 @@ public class MainFragmentTest {
     }
 
     @Test
-    public void restoreTrips() {
+    public void restoreFromPreferences() {
         startFragment(mainFragment, MainActivity.class);
         mainFragment.stopFinder = spy(mainFragment.stopFinder);
-        mainFragment.sharedPreferences = spy(mainFragment.sharedPreferences);
-        doReturn(1l).when(mainFragment.sharedPreferences).getLong(MainFragment.STATION_FROM_ID, -1);
-        doReturn(2l).when(mainFragment.sharedPreferences).getLong(MainFragment.STATION_TO_ID, -1);
+        mainFragment.sharedPreferences.edit()
+            .putLong(MainFragment.STATION_FROM_ID, 1)
+            .putLong(MainFragment.STATION_TO_ID, 2l)
+            .commit();
         doReturn(Observable.just(rahway)).when(mainFragment.stopFinder).findStop(1);
         doReturn(Observable.just(penn)).when(mainFragment.stopFinder).findStop(2);
-        TripResult result = new TripResult(null, "08:27", "09:08", "4420");
+        TripResult result = new TripResult(LocalDate.now(), "08:27", "09:08", "4420");
         mainFragment.tripFinder = spy(mainFragment.tripFinder);
         LocalDate localDate = LocalDate.now();
         Observable<List<TripResult>> tripResults = Observable.just(singletonList(result));
         doReturn(tripResults).when(mainFragment.tripFinder).findTrips(localDate, rahway, penn);
 
-        mainFragment.restoreStops(null);
+        mainFragment.onActivityCreated(null);
 
         // verify stops were set
         assertEquals(rahway, mainFragment.fromStation);

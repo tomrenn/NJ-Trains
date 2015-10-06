@@ -1,7 +1,6 @@
 package com.tomrenn.njtrains.ui.stationpicker;
 
 import android.support.annotation.Nullable;
-import android.support.customtabs.CustomTabsIntent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;

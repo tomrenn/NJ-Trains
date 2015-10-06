@@ -17,7 +17,7 @@ import static org.assertj.android.api.Assertions.assertThat;
  *
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class)
+@Config(constants = BuildConfig.class, sdk=21)
 public class DbOpenHelperTest {
 
     DbOpenHelper helper;

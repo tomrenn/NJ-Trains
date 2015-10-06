@@ -1,12 +1,9 @@
 package com.tomrenn.njtrains.ui;
 
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,13 +15,10 @@ import android.widget.Button;
 
 import com.tomrenn.njtrains.Injector;
 import com.tomrenn.njtrains.R;
-import com.tomrenn.njtrains.data.StopLookup;
 import com.tomrenn.njtrains.data.api.StopFinder;
 import com.tomrenn.njtrains.data.api.TripFinder;
-import com.tomrenn.njtrains.data.api.TripRequest;
 import com.tomrenn.njtrains.data.api.TripResult;
 import com.tomrenn.njtrains.data.db.Stop;
-import com.tomrenn.njtrains.ui.stationpicker.StationPickerFragment;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import org.threeten.bp.Clock;
@@ -38,11 +32,8 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 /**
  *
@@ -77,25 +68,31 @@ public class MainFragment extends Fragment {
     Action1<Stop> toStationSelection = new Action1<Stop>() {
         @Override
         public void call(Stop stop) {
+            if (toStation != stop){ // request b/c of stop change
+                requestIfPossible(fromStation, stop);
+            }
             toStation = stop;
             toStationBtn.setText(stop.prettyName());
-            requestIfPossible();
+
         }
     };
 
     Action1<Stop> fromStationSelection = new Action1<Stop>() {
         @Override
         public void call(Stop stop) {
+            if (fromStation != stop){ // request b/c of stop change
+                requestIfPossible(stop, toStation);
+            }
             fromStation = stop;
             fromStationBtn.setText(stop.prettyName());
-            requestIfPossible();
         }
     };
+    private TripResultAdapter adapter;
 
-    void requestIfPossible(){
-        if (fromStation != null
-                && toStation != null){
-            tripFinder.findTrips(LocalDate.now(clock), fromStation, toStation)
+    void requestIfPossible(Stop from, Stop to){
+        if (from != null
+                && to != null){
+            tripFinder.findTrips(LocalDate.now(clock), from, to)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(handleResults);
         }
@@ -173,6 +170,10 @@ public class MainFragment extends Fragment {
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         results.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        if (adapter != null){
+            results.setAdapter(adapter);
+        }
+
         if (savedInstanceState != null){
             restoreStops(savedInstanceState);
         } else {
@@ -211,7 +212,7 @@ public class MainFragment extends Fragment {
         @Override
         public void call(List<TripResult> tripResults) {
             // nothing
-            TripResultAdapter adapter = new TripResultAdapter(tripResults);
+            adapter = new TripResultAdapter(tripResults);
             results.setAdapter(adapter);
         }
     };

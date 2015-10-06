@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
  *
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class)
+@Config(constants = BuildConfig.class, sdk=21)
 public class TripFinderTest {
 
     NJTripFinder tripFinder;
@@ -64,15 +64,15 @@ public class TripFinderTest {
         insertStop(db, NYP_STOP_ID, "NYP");
 
         // to NYC
-        insertStopTime(db, RAHWAY_STOP_ID, TRIP1, 2, "7:27am");
-        insertStopTime(db, NYP_STOP_ID, TRIP1, 8, "8:08am");
+        insertStopTime(db, RAHWAY_STOP_ID, TRIP1, 2, "7:27");
+        insertStopTime(db, NYP_STOP_ID, TRIP1, 8, "8:08");
         // to RAHWAY
-        insertStopTime(db, NYP_STOP_ID, TRIP2, 0, "5:32pm");
-        insertStopTime(db, RAHWAY_STOP_ID, TRIP2, 6, "6:12pm");
+        insertStopTime(db, NYP_STOP_ID, TRIP2, 0, "5:32");
+        insertStopTime(db, RAHWAY_STOP_ID, TRIP2, 6, "6:12");
 
-        insertTrip(db, TRIP1, NE_CORRIDER, 0);
-        insertTrip(db, TRIP2, NE_CORRIDER, 1);
-        insertTrip(db, TRIP3, NE_CORRIDER, 2);
+        insertTrip(db, TRIP1, NE_CORRIDER, 4);
+        insertTrip(db, TRIP2, NE_CORRIDER, 4);
+        insertTrip(db, TRIP3, NE_CORRIDER, 4);
     }
 
     /** Only Trip 1 goes from Rahway _to_ NYP */
