@@ -1,10 +1,6 @@
 package com.tomrenn.njtrains.data.api;
 
-import android.content.ContentValues;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteStatement;
-import android.os.HandlerThread;
 
 import com.tomrenn.njtrains.data.db.Route;
 import com.tomrenn.njtrains.data.db.ServiceDate;
@@ -12,18 +8,11 @@ import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.data.db.StopTime;
 import com.tomrenn.njtrains.data.db.Trip;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
-import okio.BufferedSource;
-import okio.Okio;
-import okio.Source;
 import rx.Observer;
 import rx.functions.Action1;
 import timber.log.Timber;
@@ -63,56 +52,11 @@ public class CsvFileObserver implements Observer<File>, Action1<File> {
             return;
         }
 
-        BufferedSource fileSource;
-        int numInserted = 0;
-
         try {
-            fileSource = Okio.buffer(Okio.source(file));
-            StringBuilder strBuilder = new StringBuilder("INSERT INTO " + tableName + " (");
-
-            SQLiteStatement sqLiteStatement = null;
-
-            db.beginTransaction();
-            while (!fileSource.exhausted()){
-                String line = fileSource.readUtf8Line();
-                // first line
-                if (sqLiteStatement == null){
-                    int numArgs = line.split(",").length;
-                    strBuilder.append(line) // the column order
-                            .append(") values(");
-                    for (int i = 0; i < numArgs; i++) {
-                        strBuilder.append("?,");
-                    }
-                    // delete last comma ','
-                    strBuilder.deleteCharAt(strBuilder.length() - 1);
-                    strBuilder.append(")");
-                    sqLiteStatement = db.compileStatement(strBuilder.toString());
-                    continue;
-                }
-                String[] values = line.split(",");
-                for (int i=0; i<values.length; i++){
-                    String value = values[i];
-                    // we could optimize this a little, only StopTime.arrival/StopTime.departure have colons
-//                    if (value.contains(":")){
-//                        value = "\"" + value + "\"";
-//                    } else if (value.isEmpty()){
-//                        value = "\"\"";
-//                    }
-
-                    // for Stop.stop_name which is enclosed in quotes
-                    if (value.startsWith("\"") && value.endsWith("\"")){
-                        value = value.substring(1, value.length()-1);
-                    }
-                    sqLiteStatement.bindString(i+1, value);
-                }
-                sqLiteStatement.executeInsert();
-                numInserted++;
-            }
-            db.setTransactionSuccessful();
-            db.endTransaction();
-            Timber.d("Inserted " + numInserted + " rows into table " + tableName);
+            TableImportStrategy importStrategy = TableImportStrategy.from(db, file);
+            importStrategy.importAll();
         } catch (IOException e){
-            Timber.e(e, "Something bad happened");
+            Timber.e(e, "Something bad happened during " + file);
         }
     }
 
