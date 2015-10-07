@@ -5,4 +5,6 @@
     <string name="action_settings">Settings</string>
 
     <string name="find_station">Find station</string>
+
+    <string name="hint_all_routes">All train lines</string>
 </resources>

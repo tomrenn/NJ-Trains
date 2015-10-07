@@ -16,7 +16,7 @@ public interface StopFinder {
 
     Observable<List<Stop>> searchStops(String name);
 
-    Observable<List<Station>> searchStations(String name);
+    Observable<List<Station>> searchStations(String name, long routeId);
 
     Observable<List<Route>> allRoutes();
 

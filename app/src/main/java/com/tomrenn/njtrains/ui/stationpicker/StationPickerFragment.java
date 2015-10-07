@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -36,6 +37,7 @@ import butterknife.ButterKnife;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import timber.log.Timber;
 
 import static com.tomrenn.njtrains.ui.stationpicker.StationAdapter.StopSelectedListener;
 
@@ -55,6 +57,7 @@ public class StationPickerFragment extends Fragment {
     @Bind(R.id.recyclerView) RecyclerView recyclerView;
 
     @VisibleForTesting int stationAction;
+    long routeId = Route.NON_SELECTABLE_ID;
     StationAdapter stationAdapter;
     Subscription textChangeSubscription;
 
@@ -77,7 +80,7 @@ public class StationPickerFragment extends Fragment {
         recyclerView.setAdapter(stationAdapter);
 
         textChangeSubscription = RxTextView.textChanges(searchField)
-                .debounce(200, TimeUnit.MILLISECONDS)
+                .debounce(500, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(findStationStops);
 
@@ -100,7 +103,7 @@ public class StationPickerFragment extends Fragment {
     Action1<CharSequence> findStationStops = new Action1<CharSequence>() {
         @Override
         public void call(CharSequence query) {
-            stopFinder.searchStations(query.toString())
+            stopFinder.searchStations(query.toString(), routeId)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(receiveResults);
         }
@@ -123,41 +126,25 @@ public class StationPickerFragment extends Fragment {
                 .subscribe(new Action1<List<Route>>() {
                     @Override
                     public void call(final List<Route> routes) {
-                        BaseAdapter adapter = new BindableAdapter<Route>(getActivity()) {
-                            @Override
-                            public void bindView(Route item, int position, View view) {
-                                TextView tv = ButterKnife.findById(view, android.R.id.text1);
-                                tv.setText(item.getName());
-                            }
-
-                            @Override
-                            public int getCount() {
-                                return routes.size();
-                            }
-
-                            @Override
-                            public Route getItem(int position) {
-                                return routes.get(position);
-                            }
-
-                            @Override
-                            public long getItemId(int position) {
-                                return 0;
-                            }
-
-                            @Override
-                            public View newView(LayoutInflater inflater, int position, ViewGroup container) {
-                                return inflater.inflate(android.R.layout.simple_spinner_item, container, false);
-                            }
-                        };
-                        routeSpinner.setAdapter(adapter);
+                        routeSpinner.setAdapter(new RouteAdapter(getActivity(), routes));
                     }
                 });
+        routeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Timber.d("Route id selected = " + id);
+                StationPickerFragment.this.routeId = id;
+                findStationStops.call(StationPickerFragment.this.searchField.getText());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
 
         stationAdapter.setStopSelectedListener(new StopSelectedListener() {
             @Override
             public void onStopSelected(Stop stop) {
-                if (stationAction == FROM_STATION){
+                if (stationAction == FROM_STATION) {
                     mainCallbacks.selectedDeparture(stop);
                 } else {
                     mainCallbacks.selectedDestination(stop);
@@ -166,6 +153,5 @@ public class StationPickerFragment extends Fragment {
         });
         findStationStops.call("");
     }
-
 
 }

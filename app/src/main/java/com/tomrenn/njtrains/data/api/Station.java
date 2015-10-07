@@ -17,14 +17,6 @@ import rx.functions.Func1;
  *
  */
 public class Station {
-    public static String LOOKUP_QUERY = "SELECT DISTINCT"
-            + " stop_times.stop_id, stops.stop_name, trips.route_id, routes.route_long_name, routes.route_type"
-        + " FROM stop_times "
-        + " JOIN stops ON (stop_times.stop_id=stops.stop_id AND stops.stop_name like ?)"
-        + " JOIN trips ON (stop_times.trip_id=trips.trip_id)"
-        + " JOIN routes ON (trips.route_id=routes.route_id)"
-        + " ORDER BY stop_times.stop_id";
-
     private String name;
     private long stopId;
     private Route[] routes;
@@ -33,6 +25,22 @@ public class Station {
         this.name = name;
         this.stopId = stopId;
         this.routes = routes;
+    }
+
+    public static String getLookupQuery(long routeId) {
+        StringBuilder strBuilder = new StringBuilder(400);
+        strBuilder.append("SELECT DISTINCT")
+                .append(" stop_times.stop_id, stops.stop_name, stops.stop_name, trips.route_id, routes.route_long_name, routes.route_type")
+                .append(" FROM stop_times")
+                .append(" JOIN stops ON (stop_times.stop_id=stops.stop_id AND stops.stop_name like ?)")
+                .append(" JOIN trips ON (stop_times.trip_id=trips.trip_id");
+        if (routeId != Route.NON_SELECTABLE_ID) {
+            strBuilder.append(" AND trips.route_id=").append(routeId);
+        }
+        strBuilder.append(")")
+                .append(" JOIN routes ON (trips.route_id=routes.route_id)")
+                .append(" ORDER BY stops.stop_name");
+        return strBuilder.toString();
     }
 
     public String prettyName(){

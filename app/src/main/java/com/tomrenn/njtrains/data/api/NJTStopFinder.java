@@ -28,6 +28,7 @@ import timber.log.Timber;
  */
 @Singleton
 public class NJTStopFinder implements StopFinder {
+    public static final int SEARCH_ALL_ROUTES = -1;
     private static final String LIST_QUERY = "SELECT * FROM "
             + Stop.TABLE
             + " WHERE " + Stop.NAME + " LIKE ?"
@@ -79,10 +80,10 @@ public class NJTStopFinder implements StopFinder {
     }
 
     @Override
-    public Observable<List<Station>> searchStations(String name) {
+    public Observable<List<Station>> searchStations(String name, long routeId) {
         name = "%" + name + "%";
 
-        return execQuery(Station.LOOKUP_QUERY, name)
+        return execQuery(Station.getLookupQuery(routeId), name)
                 .map(Station.cursorToValue)
                 .subscribeOn(Schedulers.computation());
     }

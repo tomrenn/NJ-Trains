@@ -12,6 +12,8 @@ import rx.functions.Func1;
  *
  */
 public class Route {
+    public static final int NON_SELECTABLE_ID = -1;
+
     public static final String TABLE = "routes";
 
     public static final String ID = "route_id";
