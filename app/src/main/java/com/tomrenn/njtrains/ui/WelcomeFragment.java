@@ -24,7 +24,7 @@ import timber.log.Timber;
  * Manage a preference whether initial data load is completed.
  */
 public class WelcomeFragment extends Fragment {
-
+    @Inject MainCallbacks mainCallbacks;
     @Inject TransitDataManager transitDataManager;
 
     @Bind(R.id.progressText) TextView progressText;
@@ -45,6 +45,7 @@ public class WelcomeFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Injector.obtain(getActivity().getApplicationContext()).inject(this);
+
         transitDataManager.fetchLatestData(new TransitDataManager.StateListener() {
             @Override
             public void update(final String parodyDesc) {
@@ -60,12 +61,8 @@ public class WelcomeFragment extends Fragment {
             .subscribe(new Observer<Void>() {
                 @Override
                 public void onCompleted() {
-                    Timber.d("Files completed");
-                    getFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.fragmentContainer, MainFragment.getInstance())
-                            .setCustomAnimations(R.anim.abc_slide_out_bottom, R.anim.abc_slide_out_bottom)
-                            .commit();
+                    Timber.d("Transit data completed");
+                    mainCallbacks.finishedWelcome();
                 }
 
                 @Override

@@ -8,6 +8,7 @@ import rx.functions.Action1;
  *
  */
 public interface MainCallbacks {
+    void finishedWelcome();
 
     void pickStationDeparture(Action1<Stop> selected);
     void selectedDeparture(Stop stop);

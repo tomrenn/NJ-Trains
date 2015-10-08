@@ -14,7 +14,7 @@ import dagger.Provides;
     addsTo = NJTModule.class,
     injects = {
             MainFragment.class,
-            StationPickerFragment.class
+            StationPickerFragment.class, WelcomeFragment.class
     }
 )
 public class MainActivityModule {

@@ -24,7 +24,7 @@ import dagger.Provides;
     library = true,
     complete = false,
     injects = {
-            MainActivity.class, WelcomeFragment.class
+            MainActivity.class
     }
 )
 public class ApiModule {

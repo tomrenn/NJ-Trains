@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Utils.riseAndShine(this);
-        Timber.plant(new Timber.DebugTree());
 
         ObjectGraph appGraph = Injector.obtain(getApplicationContext());
         appGraph.inject(this);
@@ -107,6 +106,16 @@ public class MainActivity extends AppCompatActivity implements MainCallbacks {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void finishedWelcome() {
+        this.mainFragment = MainFragment.getInstance();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, mainFragment)
+                .setCustomAnimations(R.anim.abc_slide_out_bottom, R.anim.abc_slide_out_bottom)
+                .commit();
     }
 
     @Override
