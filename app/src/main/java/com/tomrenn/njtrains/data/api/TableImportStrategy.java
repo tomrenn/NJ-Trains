@@ -50,35 +50,38 @@ public class TableImportStrategy {
         SQLiteStatement sqLiteStatement = null;
 
         db.beginTransaction();
-        while (!fileSource.exhausted()){
-            String line = fileSource.readUtf8Line();
-            // first line
-            if (sqLiteStatement == null){
-                String[] columnNames = line.split(",");
-                handleColumnNames(columnNames);
-                int numArgs = columnNames.length;
-                strBuilder.append(line) // the column order
-                        .append(") values(");
-                for (int i = 0; i < numArgs; i++) {
-                    strBuilder.append("?,");
+        try {
+            while (!fileSource.exhausted()) {
+                String line = fileSource.readUtf8Line();
+                // first line
+                if (sqLiteStatement == null) {
+                    String[] columnNames = line.split(",");
+                    handleColumnNames(columnNames);
+                    int numArgs = columnNames.length;
+                    strBuilder.append(line) // the column order
+                            .append(") values(");
+                    for (int i = 0; i < numArgs; i++) {
+                        strBuilder.append("?,");
+                    }
+                    // delete last comma ','
+                    strBuilder.deleteCharAt(strBuilder.length() - 1);
+                    strBuilder.append(")");
+                    sqLiteStatement = db.compileStatement(strBuilder.toString());
+                    continue;
                 }
-                // delete last comma ','
-                strBuilder.deleteCharAt(strBuilder.length() - 1);
-                strBuilder.append(")");
-                sqLiteStatement = db.compileStatement(strBuilder.toString());
-                continue;
-            }
-            String[] values = line.split(",");
-            values = cleanUpValues(values);
+                String[] values = line.split(",");
+                values = cleanUpValues(values);
 
-            for (int i=0; i<values.length; i++){
-                String value = values[i];
-                sqLiteStatement.bindString(i+1, value);
+                for (int i = 0; i < values.length; i++) {
+                    String value = values[i];
+                    sqLiteStatement.bindString(i + 1, value);
+                }
+                sqLiteStatement.executeInsert();
             }
-            sqLiteStatement.executeInsert();
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
         }
-        db.setTransactionSuccessful();
-        db.endTransaction();
     }
 
 

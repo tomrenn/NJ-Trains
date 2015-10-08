@@ -22,10 +22,12 @@ import java.util.zip.ZipInputStream;
 import okio.BufferedSink;
 import okio.Okio;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import timber.log.Timber;
 
 /**
  * States we need to check.
@@ -77,13 +79,17 @@ public class NJTDataManager implements TransitDataManager {
         final File csvDir = new File(directory, DATA_DIR);
 
         notifyListener(stateListener, "Downloading...").call(null);
+        Action1<File> tableImport = new CSVTableImport(sqLiteOpenHelper.getWritableDatabase());
+
+        Timber.d("Fetching latest data");
 
         return Observable.create(new GetLatest(httpClient, lastUpdated.get(), zipFile))
                 .doOnNext(notifyListener(stateListener, "Unzipping..."))
                 .flatMap(unzip(csvDir))
                 .doOnNext(notifyListener(stateListener, "Delayed outside tunnel"))
-                .doOnNext(new CsvFileObserver(sqLiteOpenHelper.getWritableDatabase()))
+                .doOnNext(tableImport)
                 .ignoreElements().cast(Void.class)
+                .concatWith(TidyTable.asObservable(sqLiteOpenHelper.getWritableDatabase()))
                 .doOnCompleted(new Action0() {
                     @Override
                     public void call() {
@@ -134,13 +140,6 @@ public class NJTDataManager implements TransitDataManager {
         } finally {
             zis.close();
         }
-    }
-
-    void loadCsvFiles(File csvDir){
-//        Observable.create()
-//        Observable.from(csvDir.listFiles())
-//                .observeOn(Schedulers.io())
-//                .subscribe(new CsvFileObserver(sqLiteOpenHelper.getWritableDatabase()));
     }
 
     // Get the latest zip file from backend
