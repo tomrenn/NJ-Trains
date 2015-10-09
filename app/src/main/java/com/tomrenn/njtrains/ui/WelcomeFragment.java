@@ -44,7 +44,7 @@ public class WelcomeFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Injector.obtain(getActivity().getApplicationContext()).inject(this);
+        Injector.obtain(getActivity()).inject(this);
 
         transitDataManager.fetchLatestData(new TransitDataManager.StateListener() {
             @Override

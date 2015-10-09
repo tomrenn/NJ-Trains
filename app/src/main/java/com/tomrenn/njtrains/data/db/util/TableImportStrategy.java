@@ -1,4 +1,4 @@
-package com.tomrenn.njtrains.data.api;
+package com.tomrenn.njtrains.data.db.util;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -102,6 +102,25 @@ public class TableImportStrategy {
             }
         }
 
+        static String cleanLightRail(String stopName){
+            String lowercase = stopName.toLowerCase();
+            if (lowercase.matches(".*light rail sta(?:tion)?$")) {
+                int index = lowercase.indexOf("light rail sta");
+                if (index != -1){
+                    return stopName.substring(0, index).trim();
+                }
+            }
+            return stopName;
+        }
+
+        static String cleanSecaucus(String stopName){
+            String prefix = "frank r lautenberg ";
+            if (stopName.toLowerCase().startsWith(prefix)){
+                return stopName.substring(prefix.length());
+            }
+            return stopName;
+        }
+
         @Override
         protected String[] cleanUpValues(String[] values) {
             if (stopNameIndex != -1){
@@ -111,6 +130,9 @@ public class TableImportStrategy {
                     // we're also going to remove things like "Light Rail Station" from stop_name.
                     // also rename Frank R Lautenberg Secaucus to just Secaucus X
                 }
+                name = cleanLightRail(name);
+                name = cleanSecaucus(name);
+
                 values[stopNameIndex] = name;
             }
             return values;

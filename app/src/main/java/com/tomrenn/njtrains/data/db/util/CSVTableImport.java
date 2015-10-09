@@ -1,4 +1,4 @@
-package com.tomrenn.njtrains.data.api;
+package com.tomrenn.njtrains.data.db.util;
 
 import android.database.sqlite.SQLiteDatabase;
 
@@ -28,7 +28,6 @@ public class CSVTableImport implements Action1<File> {
     public CSVTableImport(SQLiteDatabase db) {
         this.db = db;
     }
-
 
     boolean tableExists(String tableName){
         return TABLES.contains(tableName);

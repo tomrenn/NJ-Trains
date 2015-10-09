@@ -8,6 +8,8 @@ import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.tomrenn.njtrains.data.db.util.CSVTableImport;
+import com.tomrenn.njtrains.data.db.util.TidyTable;
 import com.tomrenn.njtrains.data.prefs.StringPreference;
 
 import java.io.BufferedInputStream;
@@ -22,7 +24,6 @@ import java.util.zip.ZipInputStream;
 import okio.BufferedSink;
 import okio.Okio;
 import rx.Observable;
-import rx.Observer;
 import rx.Subscriber;
 import rx.functions.Action0;
 import rx.functions.Action1;

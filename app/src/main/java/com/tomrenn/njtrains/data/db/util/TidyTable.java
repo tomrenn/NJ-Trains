@@ -1,4 +1,4 @@
-package com.tomrenn.njtrains.data.api;
+package com.tomrenn.njtrains.data.db.util;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -66,7 +66,7 @@ public class TidyTable implements Observable.OnSubscribe<Void>{
     void updateTrips(long routeId, long duplicateId) {
         ContentValues contentValues = new ContentValues(1);
         contentValues.put("route_id", routeId);
-        db.update(Trip.TABLE,  contentValues, "route_id=?", new String[]{String.valueOf(duplicateId)});
+        db.update(Trip.TABLE, contentValues, "route_id=?", new String[]{String.valueOf(duplicateId)});
     }
 
     void removeRoute(long routeId){
