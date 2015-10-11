@@ -2,28 +2,41 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
 
-    <EditText
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:transitionName="stopField"
-        android:id="@+id/search"
-        android:hint="@string/find_station"
-        android:layout_gravity="center_horizontal"
-        tools:ignore="UnusedAttribute" />
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:background="@color/colorPrimary">
 
-    <Spinner
-        android:id="@+id/routeSpinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/routeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dialog"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:transitionName="stopField"
+            android:id="@+id/search"
+            android:hint="@string/find_station"
+            android:layout_gravity="center_horizontal"
+            tools:ignore="UnusedAttribute" />
+    </android.support.design.widget.AppBarLayout>
+
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:id="@+id/recyclerView"/>
 
 </LinearLayout>

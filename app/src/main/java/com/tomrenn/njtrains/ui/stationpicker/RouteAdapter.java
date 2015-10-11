@@ -62,6 +62,6 @@ public class RouteAdapter extends BindableAdapter<Route> {
 
     @Override
     public View newView(LayoutInflater inflater, int position, ViewGroup container) {
-        return inflater.inflate(android.R.layout.simple_spinner_item, container, false);
+        return inflater.inflate(R.layout.support_simple_spinner_dropdown_item, container, false);
     }
 }
