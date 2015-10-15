@@ -7,11 +7,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tomrenn.njtrains.R;
-import com.tomrenn.njtrains.data.api.TripResult;
+import com.tomrenn.njtrains.data.api.models.TripResult;
 
-import org.w3c.dom.Text;
+import org.threeten.bp.Clock;
+import org.threeten.bp.Instant;
+import org.threeten.bp.ZoneOffset;
+import org.threeten.bp.temporal.ChronoField;
+import org.threeten.bp.temporal.TemporalField;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import static butterknife.ButterKnife.findById;
 
@@ -20,7 +26,7 @@ import static butterknife.ButterKnife.findById;
  */
 public class TripResultAdapter extends RecyclerView.Adapter<TripResultAdapter.ResultViewHolder> {
     private List<TripResult> results;
-
+    @Inject Clock clock;
     public TripResultAdapter(List<TripResult> results) {
         this.results = results;
     }
@@ -34,7 +40,9 @@ public class TripResultAdapter extends RecyclerView.Adapter<TripResultAdapter.Re
     @Override
     public void onBindViewHolder(ResultViewHolder holder, int position) {
         TripResult result = results.get(position);
-        holder.departureWarning.setText(result.getDuration() + " minutes");
+//        result.departure.toInstant(ZoneOffset)
+        holder.serviceLine.setText(result.serviceNumber);
+                holder.departureWarning.setText(result.getDuration() + " minutes");
         holder.time.setText(result.departureTime + " - " + result.arrivalTime);
         holder.serviceLine.setText(result.serviceNumber);
     }

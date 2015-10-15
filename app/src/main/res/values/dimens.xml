@@ -4,5 +4,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="item_spacing">8dp</dimen>
 
-    <dimen name="result_height">150dp</dimen>
+    <dimen name="result_height">120dp</dimen>
 </resources>

@@ -22,11 +22,12 @@ public class Utils {
         db.insert(Stop.TABLE, values);
     }
 
-    public static void insertTrip(BriteDatabase db, int tripId, int routeId, int serviceId){
+    public static void insertTrip(BriteDatabase db, int tripId, int routeId, int serviceId, String blockId){
         ContentValues contentValues = new ContentValues();
         contentValues.put(Trip.ID, tripId);
         contentValues.put(Trip.ROUTE_ID, routeId);
         contentValues.put(Trip.SERVICE_ID, serviceId);
+        contentValues.put(Trip.BLOCK_ID, blockId);
         contentValues.put(Trip.HEADSIGN, "");
 
         db.insert(Trip.TABLE, contentValues);

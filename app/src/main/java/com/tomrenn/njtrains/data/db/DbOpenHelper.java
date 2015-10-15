@@ -43,7 +43,7 @@ public final class DbOpenHelper extends SQLiteOpenHelper {
             + Trip.ROUTE_ID + " INTEGER NOT NULL,"
             + Trip.HEADSIGN + " TEXT NOT NULL,"
             + Trip.DIRECTION_ID + " INTEGER NOT NULL DEFAULT 0,"
-            + Trip.BLOCK_ID + " INTEGER NOT NULL DEFAULT 0,"
+            + Trip.BLOCK_ID + " TEXT NOT NULL,"
             + Trip.SHAPE_ID + " INTEGER NOT NULL DEFAULT 0"
             + ")";
 

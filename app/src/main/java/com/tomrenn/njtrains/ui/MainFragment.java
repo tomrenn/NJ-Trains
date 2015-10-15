@@ -18,7 +18,7 @@ import com.tomrenn.njtrains.Injector;
 import com.tomrenn.njtrains.R;
 import com.tomrenn.njtrains.data.api.StopFinder;
 import com.tomrenn.njtrains.data.api.TripFinder;
-import com.tomrenn.njtrains.data.api.TripResult;
+import com.tomrenn.njtrains.data.api.models.TripResult;
 import com.tomrenn.njtrains.data.db.Stop;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
@@ -185,7 +185,10 @@ public class MainFragment extends Fragment {
                 toStationSelection.call(toStation);
             }
         }
-        // restore from preferences
+        restoreFromPreferences();
+    }
+
+    void restoreFromPreferences() {
         if (fromStation == null){
             restoreStop(STATION_FROM_ID, fromStationSelection);
         }

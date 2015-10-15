@@ -1,4 +1,4 @@
-package com.tomrenn.njtrains.data.api;
+package com.tomrenn.njtrains.data.api.models;
 
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
@@ -30,6 +30,7 @@ public class TripResult {
     public long getDuration(){
         return Duration.between(departure, arrival).toMinutes();
     }
+
 
     LocalDateTime parse(LocalDate date, String time){
         String[] slices = time.split(":");

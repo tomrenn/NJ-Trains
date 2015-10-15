@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 import com.tomrenn.njtrains.BuildConfig;
+import com.tomrenn.njtrains.data.api.models.TripResult;
 import com.tomrenn.njtrains.data.db.DbOpenHelper;
 import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.data.db.StopTime;
@@ -36,7 +37,7 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk=21)
-public class TripFinderTest {
+public class NJTripFinderTest {
 
     NJTripFinder tripFinder;
     BriteDatabase db;
@@ -70,9 +71,9 @@ public class TripFinderTest {
         insertStopTime(db, NYP_STOP_ID, TRIP2, 0, "5:32");
         insertStopTime(db, RAHWAY_STOP_ID, TRIP2, 6, "6:12");
 
-        insertTrip(db, TRIP1, NE_CORRIDER, 4);
-        insertTrip(db, TRIP2, NE_CORRIDER, 4);
-        insertTrip(db, TRIP3, NE_CORRIDER, 4);
+        insertTrip(db, TRIP1, NE_CORRIDER, 4, "#8321");
+        insertTrip(db, TRIP2, NE_CORRIDER, 4, "#8321");
+        insertTrip(db, TRIP3, NE_CORRIDER, 4, "#8321");
     }
 
     /** Only Trip 1 goes from Rahway _to_ NYP */

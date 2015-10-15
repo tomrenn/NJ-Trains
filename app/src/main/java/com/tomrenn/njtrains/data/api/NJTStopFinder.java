@@ -3,13 +3,10 @@ package com.tomrenn.njtrains.data.api;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
-import com.tomrenn.njtrains.data.db.Db;
+import com.tomrenn.njtrains.data.api.models.Station;
 import com.tomrenn.njtrains.data.db.Route;
 import com.tomrenn.njtrains.data.db.Stop;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -17,11 +14,8 @@ import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
-import timber.log.Timber;
 
 /**
  *

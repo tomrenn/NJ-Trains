@@ -1,10 +1,9 @@
 package com.tomrenn.njtrains.ui;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.tomrenn.njtrains.BuildConfig;
-import com.tomrenn.njtrains.data.api.TripResult;
+import com.tomrenn.njtrains.data.api.models.TripResult;
 import com.tomrenn.njtrains.data.db.Stop;
 
 import org.junit.Before;
@@ -35,7 +34,7 @@ import static org.robolectric.shadows.support.v4.SupportFragmentTestUtil.startFr
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk=21)
-public class MainFragmentTest {
+public class TestMainFragment {
     MainFragment mainFragment;
     Stop rahway;
     Stop penn;
@@ -90,7 +89,8 @@ public class MainFragmentTest {
         Observable<List<TripResult>> tripResults = Observable.just(singletonList(result));
         doReturn(tripResults).when(mainFragment.tripFinder).findTrips(localDate, rahway, penn);
 
-        mainFragment.onActivityCreated(null);
+
+        mainFragment.restoreFromPreferences();
 
         // verify stops were set
         assertEquals(rahway, mainFragment.fromStation);

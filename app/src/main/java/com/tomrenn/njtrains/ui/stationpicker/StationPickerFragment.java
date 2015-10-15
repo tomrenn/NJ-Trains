@@ -7,24 +7,22 @@ import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.tomrenn.njtrains.Injector;
 import com.tomrenn.njtrains.R;
-import com.tomrenn.njtrains.data.api.Station;
+import com.tomrenn.njtrains.data.api.models.Station;
 import com.tomrenn.njtrains.data.api.StopFinder;
 import com.tomrenn.njtrains.data.db.Route;
 import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.ui.MainCallbacks;
-import com.tomrenn.njtrains.ui.misc.BindableAdapter;
 
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +50,7 @@ public class StationPickerFragment extends Fragment {
     @Inject MainCallbacks mainCallbacks;
     @Inject StopFinder stopFinder;
 
+    @Bind(R.id.toolbar) Toolbar toolbar;
     @Bind(R.id.search) EditText searchField;
     @Bind(R.id.routeSpinner) Spinner routeSpinner;
     @Bind(R.id.recyclerView) RecyclerView recyclerView;

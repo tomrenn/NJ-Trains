@@ -30,7 +30,7 @@ public class Trip {
     int serviceId;
     String headsign;
     int directionId;
-    int blockId;
+    String blockId;
     int shapeId;
 
     public static final Func1<SqlBrite.Query, List<Trip>> MAP = new Func1<SqlBrite.Query, List<Trip>>() {
@@ -44,7 +44,7 @@ public class Trip {
                     int serviceId = Db.getInt(cursor, SERVICE_ID);
                     String headsign = Db.getString(cursor, HEADSIGN);
                     int directionId = Db.getInt(cursor, DIRECTION_ID);
-                    int blockId = Db.getInt(cursor, BLOCK_ID);
+                    String blockId = Db.getString(cursor, BLOCK_ID);
                     int shapeId = Db.getInt(cursor, SHAPE_ID);
 
                     values.add(new Trip(id, routeId, serviceId, headsign, directionId, blockId, shapeId));
@@ -56,7 +56,7 @@ public class Trip {
         }
     };
 
-    public Trip(int id, int routeId, int serviceId, String headsign, int directionId, int blockId, int shapeId) {
+    public Trip(int id, int routeId, int serviceId, String headsign, int directionId, String blockId, int shapeId) {
         this.id = id;
         this.routeId = routeId;
         this.serviceId = serviceId;

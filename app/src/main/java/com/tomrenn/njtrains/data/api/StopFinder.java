@@ -1,5 +1,6 @@
 package com.tomrenn.njtrains.data.api;
 
+import com.tomrenn.njtrains.data.api.models.Station;
 import com.tomrenn.njtrains.data.db.Route;
 import com.tomrenn.njtrains.data.db.Stop;
 

@@ -3,18 +3,12 @@ package com.tomrenn.njtrains.ui;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.transition.ChangeBounds;
 import android.transition.ChangeTransform;
-import android.transition.Explode;
-import android.transition.Fade;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
 import android.transition.TransitionSet;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,21 +17,14 @@ import com.tomrenn.njtrains.Injector;
 import com.tomrenn.njtrains.R;
 import com.tomrenn.njtrains.Utils;
 import com.tomrenn.njtrains.data.api.LastUpdated;
-import com.tomrenn.njtrains.data.api.TripRequest;
-import com.tomrenn.njtrains.data.api.TripResult;
 import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.data.prefs.StringPreference;
-import com.tomrenn.njtrains.ui.MainActivityModule;
-import com.tomrenn.njtrains.ui.MainFragment;
-import com.tomrenn.njtrains.data.StopLookup;
-import com.tomrenn.njtrains.ui.WelcomeFragment;
 import com.tomrenn.njtrains.ui.stationpicker.StationPickerFragment;
 
 import javax.inject.Inject;
 
 import dagger.ObjectGraph;
 import rx.functions.Action1;
-import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements MainCallbacks {
     @Inject @LastUpdated StringPreference lastUpdated;

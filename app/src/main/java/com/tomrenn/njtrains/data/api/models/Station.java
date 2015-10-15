@@ -1,10 +1,9 @@
-package com.tomrenn.njtrains.data.api;
+package com.tomrenn.njtrains.data.api.models;
 
 import android.database.Cursor;
 
 import com.tomrenn.njtrains.data.db.Db;
 import com.tomrenn.njtrains.data.db.Route;
-import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.data.util.Strings;
 
 import java.util.ArrayList;

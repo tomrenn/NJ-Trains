@@ -1,9 +1,9 @@
 package com.tomrenn.njtrains.data.api;
 
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 
 import com.squareup.sqlbrite.BriteDatabase;
+import com.tomrenn.njtrains.data.api.models.TripResult;
 import com.tomrenn.njtrains.data.db.Db;
 import com.tomrenn.njtrains.data.db.Stop;
 import com.tomrenn.njtrains.data.db.StopTime;
@@ -62,7 +62,8 @@ public class NJTripFinder implements TripFinder {
         return Observable.create(new Observable.OnSubscribe<List<TripResult>>() {
             @Override
             public void call(Subscriber<? super List<TripResult>> subscriber) {
-                String query = "SELECT SUB1.departure_time as departure_time, SUB2.arrival_time as arrival_time "
+                String query = "SELECT SUB1.departure_time as departure_time, SUB2.arrival_time as arrival_time, "
+                            + " SUB1.block_id as block_id "
                         + "FROM ("+subTrips+") AS SUB1 "
                         + "INNER JOIN (" + subTrips + ") AS SUB2 "
                          + "ON SUB1.trip_id = SUB2.trip_id "
@@ -85,9 +86,10 @@ public class NJTripFinder implements TripFinder {
 //                        int id = Db.getInt(cursor, Trip.ID);
 //                        int routeId = Db.getInt(cursor, Trip.ROUTE_ID);
 //                        int serviceId = Db.getInt(cursor, Trip.SERVICE_ID);
+                        String serviceNum = Db.getString(cursor, Trip.BLOCK_ID);
                         String depature = Db.getString(cursor, "departure_time");
                         String arrival = Db.getString(cursor, "arrival_time");
-                        trips.add(new TripResult(localDate, depature, arrival, ""));
+                        trips.add(new TripResult(localDate, depature, arrival, serviceNum));
                     }
                 } finally {
                     cursor.close();

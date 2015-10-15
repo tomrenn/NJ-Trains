@@ -29,12 +29,21 @@ public class RouteAdapter extends BindableAdapter<Route> {
     @Override
     public void bindView(Route item, int position, View view) {
         TextView tv = ButterKnife.findById(view, android.R.id.text1);
-
         if (position == 0){
             tv.setText(R.string.hint_all_routes);
         } else {
             tv.setText(item.getName());
         }
+    }
+
+    private void bind(Route item, View view, int color) {
+
+    }
+
+    @Override
+    public void bindDropDownView(Route item, int position, View view) {
+        super.bindDropDownView(item, position, view);
+        // set color based on selection!
     }
 
     @Override

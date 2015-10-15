@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tomrenn.njtrains.R;
-import com.tomrenn.njtrains.data.api.Station;
+import com.tomrenn.njtrains.data.api.models.Station;
 import com.tomrenn.njtrains.data.db.Route;
 import com.tomrenn.njtrains.data.db.Stop;
 
