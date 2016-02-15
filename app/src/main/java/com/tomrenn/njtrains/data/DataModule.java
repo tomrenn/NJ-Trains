@@ -5,13 +5,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.preference.PreferenceManager;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
-import com.tomrenn.njtrains.NJTModule;
 import com.tomrenn.njtrains.data.api.ApiModule;
+import com.tomrenn.njtrains.data.api.TransitService;
 import com.tomrenn.njtrains.data.db.DbOpenHelper;
 
 import org.threeten.bp.Clock;
@@ -22,6 +21,8 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import retrofit2.GsonConverterFactory;
+import retrofit2.Retrofit;
 
 /**
  *
@@ -40,6 +41,17 @@ public class DataModule {
    @Provides @Singleton SharedPreferences provideSharedPreferences(Application app){
        return app.getSharedPreferences("nj_trains", Context.MODE_PRIVATE);
    }
+
+    @Provides @Singleton
+    TransitService transitService() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://njtrains-api.tomrenn.com")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        TransitService service = retrofit.create(TransitService.class);
+        return service;
+    }
 
     @Provides @Singleton Clock providesClock(){
         return Clock.systemDefaultZone();

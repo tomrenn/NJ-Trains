@@ -17,7 +17,7 @@ def ext = rootProject.ext
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion '23.0.2'
     defaultConfig {
         applicationId 'com.tomrenn.njtrains'
         minSdkVersion 16
@@ -37,7 +37,7 @@ android {
 
 configurations.all {
     resolutionStrategy {
-        force 'com.android.support:support-annotations:23.0.1'
+        force 'com.android.support:support-annotations:23.1.1'
     }
 }
 
@@ -49,21 +49,26 @@ dependencies {
     testCompile 'org.mockito:mockito-all:1.9.5'
 
 //    apt 'com.jakewharton:butterknife-compiler:7.0.1'
+    compile 'com.jakewharton:butterknife:7.0.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     provided 'com.squareup.dagger:dagger-compiler:1.2.2'
     compile 'com.squareup.dagger:dagger:1.2.2'
-    compile 'com.android.support:support-annotations:23.0.1'
+    compile 'com.android.support:support-annotations:23.1.1'
     compile 'com.jakewharton.rxbinding:rxbinding:0.2.0'
 
     compile 'com.github.frankiesardo:auto-parcel:0.3.1'
     apt 'com.github.frankiesardo:auto-parcel-processor:0.3.1'
 
     compile 'com.wdullaer:materialdatetimepicker:1.5.1'
+    compile "com.google.android.gms:play-services-gcm:8.4.0"
+
+    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
+
 
     compile "com.android.support:appcompat-v7:$ext.supportVersion"
     compile "com.android.support:recyclerview-v7:$ext.supportVersion"
     compile "com.android.support:design:$ext.supportVersion"
-    compile 'com.jakewharton:butterknife:7.0.1'
     compile 'io.reactivex:rxjava:1.0.13'
     compile 'io.reactivex:rxandroid:1.0.1'
     compile 'com.squareup.okhttp:okhttp:2.4.0'

@@ -6,10 +6,8 @@ package com.tomrenn.njtrains;
 
 import android.app.Application;
 
-
-import android.app.Application;
-
 import com.tomrenn.njtrains.data.DataModule;
+import com.tomrenn.njtrains.data.TaskService;
 
 import javax.inject.Singleton;
 
@@ -23,6 +21,7 @@ import dagger.Provides;
     },
     injects = {
 //        WSJ_App.class
+            TaskService.class
     }
 )
 public class NJTModule {
