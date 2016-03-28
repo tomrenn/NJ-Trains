@@ -1,5 +1,6 @@
 package com.tomrenn.njtrains.data.api;
 
+import rx.Completable;
 import rx.Observable;
 
 /**
@@ -11,5 +12,6 @@ public interface TransitDataManager {
         void update(String parodyDesc);
     }
 
-    Observable<Void> fetchLatestData(StateListener stateListener);
+    Completable fetchLatestData(String zipUrl, StateListener stateListener);
+
 }

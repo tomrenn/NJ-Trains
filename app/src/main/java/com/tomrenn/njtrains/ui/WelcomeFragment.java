@@ -18,6 +18,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.functions.Action1;
 import timber.log.Timber;
 
 /**
@@ -46,7 +48,7 @@ public class WelcomeFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         Injector.obtain(getActivity()).inject(this);
 
-        transitDataManager.fetchLatestData(new TransitDataManager.StateListener() {
+        transitDataManager.fetchLatestData("", new TransitDataManager.StateListener() {
             @Override
             public void update(final String parodyDesc) {
                 progressText.post(new Runnable() {
@@ -58,21 +60,16 @@ public class WelcomeFragment extends Fragment {
             }
         })
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Observer<Void>() {
+            .subscribe(new Action1<Throwable>() {
                 @Override
-                public void onCompleted() {
+                public void call(Throwable throwable) {
+                    Timber.e(throwable, "failure");
+                }
+            }, new Action0() {
+                @Override
+                public void call() {
                     Timber.d("Transit data completed");
                     mainCallbacks.finishedWelcome();
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    Timber.e(e, "failure");
-                }
-
-                @Override
-                public void onNext(Void aVoid) {
-
                 }
             });
         // transit manager with listen updates

@@ -23,6 +23,7 @@ import java.util.zip.ZipInputStream;
 
 import okio.BufferedSink;
 import okio.Okio;
+import rx.Completable;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action0;
@@ -75,7 +76,7 @@ public class NJTDataManager implements TransitDataManager {
      *
      */
     @Override
-    public Observable<Void> fetchLatestData(StateListener stateListener) {
+    public Completable fetchLatestData(String zipUrl, StateListener stateListener) {
         final File zipFile = new File(directory, DATA_ZIP);
         final File csvDir = new File(directory, DATA_DIR);
 
@@ -84,7 +85,7 @@ public class NJTDataManager implements TransitDataManager {
 
         Timber.d("Fetching latest data");
 
-        return Observable.create(new GetLatest(httpClient, lastUpdated.get(), zipFile))
+        return Observable.create(new FetchFile(httpClient, zipFile))
                 .doOnNext(notifyListener(stateListener, "Unzipping..."))
                 .flatMap(unzip(csvDir))
                 .doOnNext(notifyListener(stateListener, "Delayed outside tunnel"))
@@ -96,8 +97,10 @@ public class NJTDataManager implements TransitDataManager {
                     public void call() {
                         lastUpdated.set("20150823");
                     }
-                });
+                })
+                .toCompletable();
     }
+
 
     Func1<File, Observable<File>> unzip(final File targetDir){
         return new Func1<File, Observable<File>>() {
@@ -144,14 +147,12 @@ public class NJTDataManager implements TransitDataManager {
     }
 
     // Get the latest zip file from backend
-    static class GetLatest implements Observable.OnSubscribe<File> {
+    static class FetchFile implements Observable.OnSubscribe<File> {
         public static final String TMP_URL = "https://drive.google.com/uc?export=download&id=0BzRjnq6vdRTvdDJ5ZWUzbmVBZlk";
         private OkHttpClient httpClient;
         private File zipFile;
-        private String lastUpdated;
 
-        public GetLatest(OkHttpClient httpClient, String lastUpdated, File zipFile) {
-            this.lastUpdated = lastUpdated;
+        public FetchFile(OkHttpClient httpClient, File zipFile) {
             this.httpClient = httpClient;
             this.zipFile = zipFile;
         }
@@ -168,10 +169,6 @@ public class NJTDataManager implements TransitDataManager {
 
         @Override
         public void call(final Subscriber<? super File> subscriber) {
-            if (lastUpdated != null){
-                subscriber.onCompleted();
-                return; // todo actually find the latest..
-            }
             Request request = new Request.Builder()
                     .url(TMP_URL)
                     .get()
